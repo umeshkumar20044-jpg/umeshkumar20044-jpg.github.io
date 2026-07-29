@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Lesson — Study Session</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0d1526;
+    --bg-2: #121d34;
+    --panel: #16213c;
+    --panel-2: #1c2a48;
+    --ink: #eef1f8;
+    --ink-dim: #98a4c2;
+    --ink-faint: #5d6a8c;
+    --gold: #d6a75c;
+    --gold-dim: #a5824a;
+    --good: #5cb896;
+    --bad: #e08072;
+    --rule: rgba(214,167,92,0.18);
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: "JetBrains Mono", monospace;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html,body{
+    height:100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    overflow:hidden;
+  }
+
+  body{
+    background-image:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(214,167,92,0.07), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 110%, rgba(92,184,150,0.05), transparent 60%);
+  }
+
+  .app{
+    display:flex;
+    height:100vh;
+    width:100vw;
+  }
+
+  /* Left binder tabs — signature element */
+  .binder{
+    width:64px;
+    flex-shrink:0;
+    background: var(--bg-2);
+    border-right:1px solid var(--rule);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 0;
+    gap:6px;
+  }
+
+  .binder-mark{
+    font-family:var(--serif);
+    font-size:20px;
+    font-weight:600;
+    color:var(--gold);
+    margin-bottom:26px;
+    letter-spacing:0.02em;
+  }
+
+  .tab{
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-family: var(--mono);
+    font-size:10.5px;
+    letter-spacing:0.14em;
+    color: var(--ink-faint);
+    padding:14px 9px;
+    border-radius:3px;
+    cursor:pointer;
+    transition: color .25s ease, background .25s ease;
+    user-select:none;
+    text-transform:uppercase;
+  }
+  .tab:hover{ color: var(--ink-dim); }
+  .tab.active{
+    color: var(--bg);
+    background: var(--gold);
+    font-weight:600;
+  }
+
+  .binder-foot{
+    margin-top:auto;
+    font-family:var(--mono);
+    font-size:10px;
+    color: var(--ink-faint);
+    writing-mode: vertical-rl;
+    letter-spacing:0.1em;
+  }
+
+  /* Main stage */
+  .stage-wrap{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+  }
+
+  .progress-track{
+    height:3px;
+    background: var(--rule);
+    width:100%;
+  }
+  .progress-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    width:0%;
+    transition: width .35s ease;
+  }
+
+  .stage{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 48px 64px;
+    overflow-y:auto;
+  }
+
+  .slide{
+    width:100%;
+    max-width:920px;
+    animation: rise .45s ease both;
+  }
+
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .eyebrow{
+    font-family: var(--mono);
+    font-size:12px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color: var(--gold);
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px; height:1px;
+    background: var(--gold-dim);
+    display:inline-block;
+  }
+
+  h1.title{
+    font-family: var(--serif);
+    font-weight:600;
+    font-size:44px;
+    line-height:1.15;
+    letter-spacing:-0.01em;
+    margin-bottom:8px;
+  }
+
+  h2.slide-title{
+    font-family: var(--serif);
+    font-weight:600;
+    font-size:32px;
+    line-height:1.2;
+    margin-bottom:22px;
+  }
+
+  .subtitle{
+    font-family: var(--sans);
+    font-size:16px;
+    color: var(--ink-dim);
+    max-width:640px;
+    line-height:1.6;
+  }
+
+  /* Section title slide (full bleed) */
+  .section-slide{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    height:60vh;
+  }
+  .section-index{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--ink-faint);
+    letter-spacing:0.15em;
+    margin-bottom:18px;
+  }
+  .section-name{
+    font-family: var(--serif);
+    font-weight:700;
+    font-size:76px;
+    letter-spacing:-0.02em;
+    line-height:1;
+    color:var(--ink);
+  }
+  .section-name .accent{ color: var(--gold); }
+  .section-desc{
+    margin-top:22px;
+    font-size:16px;
+    color:var(--ink-dim);
+    max-width:560px;
+    line-height:1.6;
+  }
+
+  /* Passage */
+  .passage-card{
+    background: var(--panel);
+    border:1px solid var(--rule);
+    border-radius:10px;
+    padding:38px 42px;
+    max-height:58vh;
+    overflow-y:auto;
+  }
+  .passage-card p{
+    font-family: var(--serif);
+    font-size:18px;
+    line-height:1.75;
+    color: var(--ink);
+    margin-bottom:16px;
+  }
+  .passage-card p:last-child{ margin-bottom:0; }
+
+  /* Open questions */
+  .oq-list{ display:flex; flex-direction:column; gap:18px; margin-top:6px;}
+  .oq-item{
+    background: var(--panel);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:18px 22px;
+  }
+  .oq-num{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--gold);
+    margin-bottom:8px;
+    letter-spacing:0.08em;
+  }
+  .oq-q{
+    font-size:16px;
+    line-height:1.5;
+    margin-bottom:12px;
+    color: var(--ink);
+  }
+  .oq-item textarea{
+    width:100%;
+    background: var(--bg-2);
+    border:1px solid var(--rule);
+    border-radius:6px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size:14px;
+    padding:10px 12px;
+    resize:vertical;
+    min-height:52px;
+  }
+  .oq-item textarea:focus{ outline:none; border-color: var(--gold-dim); }
+
+  /* MCQ */
+  .q-block{ margin-top:4px; }
+  .q-text{
+    font-size:20px;
+    line-height:1.5;
+    margin-bottom:26px;
+    max-width:760px;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .option{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background: var(--panel);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:15px 18px;
+    cursor:pointer;
+    transition: border-color .2s ease, background .2s ease, transform .15s ease;
+  }
+  .option:hover{ border-color: var(--gold-dim); transform: translateX(2px); }
+  .option .letter{
+    font-family: var(--mono);
+    font-size:13px;
+    color: var(--gold);
+    width:22px; height:22px;
+    border:1px solid var(--gold-dim);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .option .otext{ font-size:15px; color: var(--ink); }
+
+  .option.correct{
+    border-color: var(--good);
+    background: rgba(92,184,150,0.09);
+  }
+  .option.correct .letter{ color:var(--good); border-color:var(--good); }
+  .option.wrong{
+    border-color: var(--bad);
+    background: rgba(224,128,114,0.09);
+  }
+  .option.wrong .letter{ color:var(--bad); border-color:var(--bad); }
+  .option.disabled{ cursor:default; }
+  .option.disabled:hover{ transform:none; }
+
+  .feedback{
+    margin-top:20px;
+    font-family: var(--mono);
+    font-size:13px;
+    letter-spacing:0.04em;
+    min-height:18px;
+  }
+  .feedback.good{ color: var(--good); }
+  .feedback.bad{ color: var(--bad); }
+
+  /* Fill blank */
+  .fb-prompt{
+    font-size:19px;
+    line-height:1.6;
+    margin-bottom:22px;
+    max-width:740px;
+  }
+  .fb-blank-tag{
+    font-family:var(--mono);
+    color:var(--gold);
+    border-bottom:1px dashed var(--gold-dim);
+    padding:0 4px;
+  }
+  .fb-row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .fb-row input[type=text]{
+    background: var(--panel);
+    border:1px solid var(--rule);
+    border-radius:6px;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size:15px;
+    padding:11px 14px;
+    width:260px;
+  }
+  .fb-row input[type=text]:focus{ outline:none; border-color: var(--gold-dim); }
+  .btn{
+    font-family: var(--sans);
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.03em;
+    color: var(--bg);
+    background: var(--gold);
+    border:none;
+    border-radius:6px;
+    padding:11px 20px;
+    cursor:pointer;
+    transition: filter .15s ease, transform .15s ease;
+  }
+  .btn:hover{ filter:brightness(1.08); transform: translateY(-1px); }
+  .btn.ghost{
+    background:transparent;
+    color: var(--ink-dim);
+    border:1px solid var(--rule);
+  }
+  .btn.ghost:hover{ color:var(--ink); border-color: var(--gold-dim); }
+
+  /* Speaking */
+  .speak-topic{
+    font-family: var(--serif);
+    font-size:30px;
+    line-height:1.3;
+    margin-bottom:30px;
+    max-width:760px;
+  }
+  .speak-box textarea{
+    width:100%;
+    min-height:220px;
+    background: var(--panel);
+    border:1px solid var(--rule);
+    border-radius:10px;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size:17px;
+    line-height:1.6;
+    padding:22px 24px;
+    resize:vertical;
+  }
+  .speak-box textarea:focus{ outline:none; border-color: var(--gold-dim); }
+  .speak-hint{
+    margin-top:12px;
+    font-size:12.5px;
+    color: var(--ink-faint);
+    font-family: var(--mono);
+  }
+
+  /* End slide */
+  .end-slide{
+    text-align:left;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    height:60vh;
+  }
+
+  /* Footer nav */
+  .stage-foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 64px 26px;
+    border-top:1px solid var(--rule);
+  }
+  .foot-left{ display:flex; align-items:center; gap:14px; }
+  .counter{
+    font-family:var(--mono);
+    font-size:12.5px;
+    color: var(--ink-faint);
+    letter-spacing:0.05em;
+  }
+  .foot-right{ display:flex; gap:10px; }
+  .nav-btn{
+    display:flex; align-items:center; gap:8px;
+    background: var(--panel);
+    border:1px solid var(--rule);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size:14px;
+    font-weight:500;
+    padding:11px 20px;
+    border-radius:7px;
+    cursor:pointer;
+    transition: border-color .2s ease, transform .15s ease;
+  }
+  .nav-btn:hover:not(:disabled){ border-color: var(--gold-dim); transform: translateY(-1px); }
+  .nav-btn:disabled{ opacity:0.3; cursor:default; }
+  .nav-btn.primary{
+    background: var(--gold);
+    color: var(--bg);
+    border-color: var(--gold);
+    font-weight:600;
+  }
+  .nav-btn.primary:hover{ filter:brightness(1.08); }
+
+  ::-webkit-scrollbar{ width:9px; height:9px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background: var(--panel-2); border-radius:8px; }
+
+  @media (max-width: 760px){
+    .binder{ display:none; }
+    .stage{ padding:28px 22px; }
+    .stage-foot{ padding:14px 22px 20px; }
+    h1.title{ font-size:30px; }
+    .section-name{ font-size:44px; }
+    .q-text{ font-size:17px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="binder">
+    <div class="binder-mark">§</div>
+    <div class="tab" data-mod="reading">Reading</div>
+    <div class="tab" data-mod="listening">Listening</div>
+    <div class="tab" data-mod="speaking">Speaking</div>
+    <div class="tab" data-mod="grammar">Grammar</div>
+    <div class="binder-foot">STUDY SESSION</div>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="stage"><div class="slide" id="slideContent"></div></div>
+    <div class="stage-foot">
+      <div class="foot-left">
+        <button class="nav-btn" id="prevBtn">← Back</button>
+        <span class="counter" id="counter"></span>
+      </div>
+      <div class="foot-right">
+        <button class="nav-btn primary" id="nextBtn">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   DATA
+--------------------------------------------------------- */
+
+const READING_TITLE = "Why Cities Are Digging Up Their Rivers";
+const READING_BODY = [
+ "In the middle decades of the twentieth century, many growing cities responded to their overcrowded waterways in a strikingly consistent way: they covered them over. Rivers and streams that had once carried both drinking water and sewage were routed into underground pipes, and the reclaimed surface was paved for roads, car parks, or housing. At the time, the logic seemed sound. A buried river no longer flooded, no longer smelled, and no longer took up space that a growing population urgently needed.",
+ "Today, a number of these same cities are undertaking the opposite project, at considerable expense, breaking open the pavement and restoring the river to daylight. The reasoning behind this reversal is only partly aesthetic. Engineers have found that exposed waterways, lined with vegetation and allowed to follow a more natural course, absorb heavy rainfall far more effectively than a sealed pipe of fixed capacity, reducing the risk of the sudden flash floods that increasingly affect paved urban areas during intense storms.",
+ "The projects are rarely straightforward. Decades of construction on top of a buried river leave a tangle of building foundations, utility cables, and transport tunnels that must be carefully mapped and, in some cases, relocated before the water can be uncovered. Local businesses and residents, meanwhile, often resist the disruption a restoration causes, particularly when it requires closing a major road or displacing parking for several years during construction.",
+ "Supporters counter that the long-term benefits extend well beyond flood control. Restored rivers tend to lower surrounding air temperatures during heatwaves, provide habitat for fish and birds that had disappeared from the city entirely, and, in several documented cases, raise property values along their banks enough to offset a meaningful share of the restoration cost. Whether every buried river is worth the expense of uncovering remains a matter of debate among planners, but the direction of thinking has clearly shifted from burial to daylight."
+];
+const READING_QUESTIONS = [
+ "Why did many cities bury their rivers in the twentieth century?",
+ "What have engineers found about how exposed waterways handle heavy rainfall compared to buried pipes?",
+ "What practical obstacles make river restoration projects difficult to carry out?",
+ "Besides flood control, what other long-term benefits do supporters claim restored rivers provide?",
+ "According to the final paragraph, how has planners' thinking shifted over time?"
+];
+
+const LISTENING_TITLE = "Seed Libraries and the Fight to Save Plant Diversity";
+const LISTENING_BODY = [
+ "In a growing number of neighbourhoods, public libraries are lending out more than books. Alongside the usual shelves, some now keep small wooden drawers filled with seed packets, available for anyone to borrow for the planting season. These seed libraries operate on a simple principle: members take a small amount of seed home, grow it, and are encouraged, though not required, to save seed from the strongest plants and return some at the end of the harvest.",
+ "The idea addresses a problem that most shoppers never think about. Commercial seed companies tend to concentrate on a small number of high-yield varieties suited to large-scale farming, which means thousands of older, locally adapted varieties have gradually disappeared from cultivation. A vegetable that once thrived in a particular valley's soil and climate, refined by generations of local growers, can vanish within a few decades if nobody continues to plant and save its seed.",
+ "Running a seed library brings its own difficulties. Volunteers must correctly identify and label varieties, prevent unrelated plants from cross-pollinating and altering a variety's characteristics, and store seed properly so it remains viable for future seasons. Because the system depends on voluntary returns, some libraries struggle with seed shortages when members forget, or simply fail, to bring anything back after harvest.",
+ "Despite these practical obstacles, organisers argue that the project's value goes beyond preserving rare vegetables. Regularly saving and exchanging seed forces gardeners to pay closer attention to which plants perform well in their specific local conditions, building a kind of practical knowledge that commercial packets, with their generic instructions, rarely provide. Supporters believe that as more communities set up their own seed libraries, the loss of plant diversity could at least be slowed, even if it cannot be fully reversed."
+];
+
+const LISTENING_MCQ = [
+ { q:"What do seed libraries lend out in addition to their usual collection?",
+   opts:["Gardening tools","Seed packets for the planting season","Reference books on farming","Plants grown by staff members"], a:1 },
+ { q:"What are members of a seed library encouraged, but not required, to do?",
+   opts:["Pay an annual membership fee","Attend a gardening class","Save seed from strong plants and return some","Donate money to local farms"], a:2 },
+ { q:"Why have many older, locally adapted vegetable varieties disappeared?",
+   opts:["Commercial seed companies focus on a small number of high-yield varieties","Climate change has made them impossible to grow","Governments have banned their cultivation","They require too much water to survive"], a:0 },
+ { q:"What must volunteers prevent to keep a variety's characteristics unchanged?",
+   opts:["Overwatering during storage","Unrelated plants cross-pollinating it","Seeds being sold commercially","Members borrowing too much seed"], a:1 },
+ { q:"What practical problem can occur because the system relies on voluntary returns?",
+   opts:["Seed libraries can run short of seed when members don't bring any back","Libraries are forced to close permanently","Seed becomes too expensive to distribute","Volunteers are legally required to farm"], a:0 },
+ { q:"According to organisers, what value does saving and exchanging seed provide beyond preserving rare vegetables?",
+   opts:["It reduces the cost of groceries significantly","It builds practical knowledge about local growing conditions","It replaces the need for professional farmers","It guarantees a larger harvest every year"], a:1 },
+ { q:"How do commercial seed packet instructions compare to the knowledge gained through seed libraries?",
+   opts:["They are more detailed and locally specific","They are generally more accurate","They are generic, unlike the local knowledge gardeners build","They are identical in most cases"], a:2 },
+ { q:"What do supporters believe seed libraries can achieve regarding plant diversity loss?",
+   opts:["Reverse it completely within a few years","Slow it, even if it cannot be fully reversed","Have no meaningful effect on it","Eliminate the need for seed companies entirely"], a:1 }
+];
+
+const SPEAKING_TOPICS = [
+ "Whether university education should be free for everyone",
+ "Whether zoos are still ethically justifiable today",
+ "The impact of artificial intelligence on creative professions",
+ "Whether the money spent on space exploration is justified"
+];
+
+const COND_MCQ = [
+ { q:"If a metal spoon sits in hot tea for too long, it ______.",
+   opts:["heats up","heated up","will heat up","would heat up"], a:0 },
+ { q:"If the council lowers bus fares, more residents ______ public transport.",
+   opts:["use","will use","used","would use"], a:1 },
+ { q:"If the orchard ______ enough rain this spring, the harvest would improve.",
+   opts:["gets","will get","got","had got"], a:2 },
+ { q:"If the archivists had digitised the letters sooner, historians ______ them years earlier.",
+   opts:["access","would access","accessed","would have accessed"], a:3 }
+];
+
+const COND_FB = [
+ { prompt:"If the theatre ______ its ticket prices, more young people would attend.", tag:"lower", accept:["lowered"] },
+ { prompt:"Butter ______ if you leave it out on a warm day.", tag:"melt", accept:["melts"] },
+ { prompt:"If the surveyors ______ the hillside more carefully, the landslide risk might have been noticed sooner.", tag:"inspect", accept:["had inspected"] },
+ { prompt:"If the council lowers bus fares, more residents will ______ public transport.", tag:"use", accept:["use"] }
+];
+
+const TP_MCQ = [
+ { q:"The foundation has been restoring the old chapel ______ 2021.",
+   opts:["since","for","from","at"], a:0 },
+ { q:"By the time the ferry departs, the crew ______ the cargo.",
+   opts:["will load","will have loaded","loaded","are loading"], a:1 },
+ { q:"The observatory stands ______ the edge of the cliff, overlooking the bay.",
+   opts:["in","on","at","by"], a:2 },
+ { q:"While the divers ______ the wreck, the research vessel stayed anchored above.",
+   opts:["examine","examined","have examined","were examining"], a:3 }
+];
+
+const TP_FB = [
+ { prompt:"The panel ______ the manuscript's authenticity since early Monday.", tag:"question", accept:["has been questioning"] },
+ { prompt:"The new regulation comes ______ force at the start of next year.", tag:"preposition", accept:["into"] },
+ { prompt:"By the next census, demographers ______ a clearer population model.", tag:"build", accept:["will have built"] },
+ { prompt:"The greenhouse depends heavily ______ consistent humidity levels.", tag:"preposition", accept:["on"] }
+];
+
+/* ---------------------------------------------------------
+   BUILD SLIDE LIST
+--------------------------------------------------------- */
+
+const slides = [];
+
+slides.push({ type:"title", mod:"reading" });
+
+slides.push({ type:"section", mod:"reading", index:"MODULE 01", name:"Reading", accent:"",
+  desc:"Read the passage carefully, then respond to five open questions in your own words." });
+slides.push({ type:"passage", mod:"reading", title:READING_TITLE, body:READING_BODY });
+slides.push({ type:"open", mod:"reading", title:READING_TITLE, questions:READING_QUESTIONS });
+
+slides.push({ type:"blank", mod:"listening", label:"LISTENING" });
+slides.push({ type:"section", mod:"listening", index:"MODULE 02", name:"Listening", accent:"",
+  desc:"Read through the transcript once, then answer eight questions one at a time." });
+slides.push({ type:"passage", mod:"listening", title:LISTENING_TITLE, body:LISTENING_BODY });
+LISTENING_MCQ.forEach((item,i)=>{
+  slides.push({ type:"mcq", mod:"listening", label:"Listening — Question "+(i+1)+" of 8", q:item.q, opts:item.opts, a:item.a });
+});
+
+slides.push({ type:"section", mod:"speaking", index:"MODULE 03", name:"Speaking", accent:"",
+  desc:"Speak or write freely on each topic for two to three minutes. There are no fixed answers." });
+SPEAKING_TOPICS.forEach((topic,i)=>{
+  slides.push({ type:"speaking", mod:"speaking", label:"Speaking Prompt "+(i+1)+" of 4", topic:topic });
+});
+
+slides.push({ type:"section", mod:"grammar", index:"MODULE 04A", name:"Conditionals", accent:"",
+  desc:"Multiple choice and fill-in items covering zero, first, second, and third conditionals." });
+COND_MCQ.forEach((item,i)=>{
+  slides.push({ type:"mcq", mod:"grammar", label:"Conditionals — Multiple Choice "+(i+1)+" of 4", q:item.q, opts:item.opts, a:item.a });
+});
+COND_FB.forEach((item,i)=>{
+  slides.push({ type:"fillblank", mod:"grammar", label:"Conditionals — Fill In "+(i+1)+" of 4", prompt:item.prompt, accept:item.accept });
+});
+
+slides.push({ type:"section", mod:"grammar", index:"MODULE 04B", name:"Tenses & Prepositions", accent:"",
+  desc:"Combined items on verb tense and preposition use." });
+TP_MCQ.forEach((item,i)=>{
+  slides.push({ type:"mcq", mod:"grammar", label:"Tenses & Prepositions — Multiple Choice "+(i+1)+" of 4", q:item.q, opts:item.opts, a:item.a });
+});
+TP_FB.forEach((item,i)=>{
+  slides.push({ type:"fillblank", mod:"grammar", label:"Tenses & Prepositions — Fill In "+(i+1)+" of 4", prompt:item.prompt, accept:item.accept });
+});
+
+slides.push({ type:"end", mod:"grammar" });
+
+/* ---------------------------------------------------------
+   RENDER
+--------------------------------------------------------- */
+
+let current = 0;
+const slideEl = document.getElementById("slideContent");
+const counterEl = document.getElementById("counter");
+const progressFill = document.getElementById("progressFill");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const tabs = document.querySelectorAll(".tab");
+
+function letter(i){ return String.fromCharCode(65+i); }
+
+function escapeHtml(str){
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function renderPassage(body){
+  return body.map(p => "<p>"+escapeHtml(p)+"</p>").join("");
+}
+
+function render(){
+  const s = slides[current];
+  let html = "";
+
+  if(s.type === "title"){
+    html = ""
+    + "<div class='eyebrow'>English Lesson · Four Modules</div>"
+    + "<h1 class='title'>Reading, Listening,<br>Speaking &amp; Grammar</h1>"
+    + "<p class='subtitle'>A single self-paced session moving through a reading passage, a listening transcript, four speaking prompts, and two grammar sets on conditionals and tenses with prepositions. Use Next to move forward at your own pace.</p>";
+  }
+
+  else if(s.type === "section"){
+    html = ""
+    + "<div class='section-slide'>"
+    + "<div class='section-index'>"+s.index+"</div>"
+    + "<div class='section-name'>"+s.name+"</div>"
+    + "<div class='section-desc'>"+s.desc+"</div>"
+    + "</div>";
+  }
+
+  else if(s.type === "blank"){
+    html = "<div class='section-slide'><div class='section-name accent' style='color:var(--gold)'>"+s.label+"</div></div>";
+  }
+
+  else if(s.type === "passage"){
+    html = ""
+    + "<div class='eyebrow'>Passage</div>"
+    + "<h2 class='slide-title'>"+escapeHtml(s.title)+"</h2>"
+    + "<div class='passage-card'>"+renderPassage(s.body)+"</div>";
+  }
+
+  else if(s.type === "open"){
+    html = ""
+    + "<div class='eyebrow'>Open Questions</div>"
+    + "<h2 class='slide-title'>"+escapeHtml(s.title)+"</h2>"
+    + "<div class='oq-list'>"
+    + s.questions.map((q,i)=>(
+        "<div class='oq-item'>"
+        + "<div class='oq-num'>Q"+(i+1)+"</div>"
+        + "<div class='oq-q'>"+escapeHtml(q)+"</div>"
+        + "<textarea placeholder='Write your answer here…'></textarea>"
+        + "</div>"
+      )).join("")
+    + "</div>";
+  }
+
+  else if(s.type === "mcq"){
+    html = ""
+    + "<div class='eyebrow'>"+s.label+"</div>"
+    + "<div class='q-block'>"
+    + "<div class='q-text'>"+escapeHtml(s.q)+"</div>"
+    + "<div class='options' id='optWrap'>"
+    + s.opts.map((o,i)=>(
+        "<div class='option' data-i='"+i+"'>"
+        + "<div class='letter'>"+letter(i)+"</div>"
+        + "<div class='otext'>"+escapeHtml(o)+"</div>"
+        + "</div>"
+      )).join("")
+    + "</div>"
+    + "<div class='feedback' id='fbText'></div>"
+    + "</div>";
+  }
+
+  else if(s.type === "fillblank"){
+    html = ""
+    + "<div class='eyebrow'>"+s.label+"</div>"
+    + "<div class='fb-prompt'>"+escapeHtml(s.prompt).replace("______", "<span class='fb-blank-tag'>______</span>")+"</div>"
+    + "<div class='fb-row'>"
+    + "<input type='text' id='fbInput' placeholder='Type your answer' autocomplete='off'>"
+    + "<button class='btn' id='fbCheck'>Check</button>"
+    + "</div>"
+    + "<div class='feedback' id='fbText'></div>";
+  }
+
+  else if(s.type === "speaking"){
+    html = ""
+    + "<div class='eyebrow'>"+s.label+"</div>"
+    + "<div class='speak-topic'>"+escapeHtml(s.topic)+"</div>"
+    + "<div class='speak-box'><textarea placeholder='Speak aloud, or note your key points here…'></textarea></div>"
+    + "<div class='speak-hint'>NO FIXED ANSWER — AIM FOR 2–3 MINUTES OF SPEECH</div>";
+  }
+
+  else if(s.type === "end"){
+    html = ""
+    + "<div class='end-slide'>"
+    + "<div class='eyebrow'>Session Complete</div>"
+    + "<h1 class='title'>Well done.</h1>"
+    + "<p class='subtitle'>You have worked through the reading passage, the listening transcript, four speaking prompts, and both grammar sets. Use Back to revisit any section.</p>"
+    + "</div>";
+  }
+
+  slideEl.innerHTML = html;
+  slideEl.style.animation = "none";
+  void slideEl.offsetWidth;
+  slideEl.style.animation = "rise .45s ease both";
+
+  attachHandlers(s);
+  updateChrome(s);
+}
+
+function attachHandlers(s){
+  if(s.type === "mcq"){
+    const opts = document.querySelectorAll("#optWrap .option");
+    const fb = document.getElementById("fbText");
+    opts.forEach(opt=>{
+      opt.addEventListener("click", ()=>{
+        if(opt.classList.contains("locked-set")) return;
+        opts.forEach(o=>o.classList.add("disabled","locked-set"));
+        const chosen = parseInt(opt.getAttribute("data-i"));
+        if(chosen === s.a){
+          opt.classList.add("correct");
+          fb.textContent = "✓ CORRECT";
+          fb.className = "feedback good";
+        } else {
+          opt.classList.add("wrong");
+          opts[s.a].classList.add("correct");
+          fb.textContent = "✗ NOT QUITE — CORRECT ANSWER: "+letter(s.a);
+          fb.className = "feedback bad";
+        }
+      });
+    });
+  }
+
+  if(s.type === "fillblank"){
+    const input = document.getElementById("fbInput");
+    const btn = document.getElementById("fbCheck");
+    const fb = document.getElementById("fbText");
+    const check = ()=>{
+      const val = input.value.trim().toLowerCase().replace(/\s+/g," ");
+      const ok = s.accept.some(a => a.toLowerCase() === val);
+      if(ok){
+        fb.textContent = "✓ CORRECT";
+        fb.className = "feedback good";
+      } else {
+        fb.textContent = "✗ NOT QUITE — ACCEPTED ANSWER: "+s.accept[0];
+        fb.className = "feedback bad";
+      }
+      input.disabled = true;
+      btn.disabled = true;
+    };
+    btn.addEventListener("click", check);
+    input.addEventListener("keydown", e=>{ if(e.key === "Enter") check(); });
+  }
+}
+
+function updateChrome(s){
+  counterEl.textContent = (current+1)+" / "+slides.length;
+  progressFill.style.width = ((current+1)/slides.length*100)+"%";
+  prevBtn.disabled = current === 0;
+  nextBtn.textContent = current === slides.length-1 ? "Restart ↺" : "Next →";
+
+  tabs.forEach(t=>{
+    t.classList.toggle("active", t.getAttribute("data-mod") === s.mod);
+  });
+}
+
+prevBtn.addEventListener("click", ()=>{
+  if(current > 0){ current--; render(); }
+});
+nextBtn.addEventListener("click", ()=>{
+  if(current < slides.length-1){ current++; render(); }
+  else { current = 0; render(); }
+});
+document.addEventListener("keydown", e=>{
+  if(e.key === "ArrowRight") nextBtn.click();
+  if(e.key === "ArrowLeft") prevBtn.click();
+});
+tabs.forEach(t=>{
+  t.addEventListener("click", ()=>{
+    const mod = t.getAttribute("data-mod");
+    const idx = slides.findIndex(sl => sl.mod === mod);
+    if(idx >= 0){ current = idx; render(); }
+  });
+});
+
+render();
+</script>
+</body>
+</html>
