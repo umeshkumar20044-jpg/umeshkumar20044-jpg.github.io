@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Umesh Kumar — Medicine</title>
+<meta name="description" content="Umesh Kumar — medical student, Università degli Studi della Campania Luigi Vanvitelli. Pursuing radiology and nuclear medicine.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B1220;
+    --surface: #101a2e;
+    --surface-2: #16223b;
+    --line: #22304d;
+    --text: #EDF1F7;
+    --text-muted: #8B97AD;
+    --text-faint: #5b6885;
+    --accent: #4FD1C5;
+    --accent-dim: #2e7d75;
+    --accent-warm: #E8A24C;
+    --radius: 2px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+
+  ::selection{ background: var(--accent); color: #06110f; }
+
+  a { color: inherit; }
+
+  .mono{
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.02em;
+  }
+
+  .wrap{
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- background scan texture ---------- */
+  .scanlines{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(79,209,197,0.025) 0px,
+      rgba(79,209,197,0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  /* ---------- nav ---------- */
+  nav{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+    background: rgba(11,18,32,0.82);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  nav .brand{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+  nav .brand strong{ color: var(--text); font-weight: 500; }
+  nav ul{
+    display:flex;
+    gap: 28px;
+    list-style: none;
+    margin:0; padding:0;
+  }
+  nav a{
+    text-decoration:none;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    transition: color 0.2s;
+  }
+  nav a:hover{ color: var(--accent); }
+  nav .links-mobile{ display:none; }
+
+  /* ---------- hero ---------- */
+  header.hero{
+    position: relative;
+    padding: 110px 0 90px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+  }
+  .sweep{
+    position:absolute;
+    top:0; left:-10%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(79,209,197,0.10), transparent);
+    animation: sweep 6s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes sweep{
+    0%   { transform: translateX(-20%); opacity: 0; }
+    15%  { opacity: 1; }
+    50%  { transform: translateX(280%); opacity: 0.6; }
+    85%  { opacity: 0; }
+    100% { transform: translateX(280%); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .sweep{ animation: none; display:none; }
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .eyebrow::before{
+    content: "";
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px 2px rgba(79,209,197,0.55);
+  }
+
+  h1{
+    font-family: 'Newsreader', serif;
+    font-weight: 500;
+    font-size: clamp(42px, 7vw, 68px);
+    line-height: 1.04;
+    margin: 0 0 20px;
+    letter-spacing: -0.01em;
+  }
+  h1 em{
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .hero p.lede{
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 560px;
+    margin: 0 0 34px;
+  }
+
+  .hero-meta{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px 34px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-faint);
+  }
+  .hero-meta span b{ color: var(--text-muted); font-weight: 500; }
+
+  /* ---------- sections ---------- */
+  section{
+    padding: 84px 0;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    z-index: 1;
+  }
+  section:last-of-type{ border-bottom: none; }
+
+  .section-head{
+    display:flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 44px;
+  }
+  .section-num{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent-dim);
+  }
+  .section-title{
+    font-family: 'Newsreader', serif;
+    font-size: 28px;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  /* about */
+  .about-grid{
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 60px;
+  }
+  .about-grid p{
+    color: var(--text-muted);
+    margin: 0 0 18px;
+    font-size: 15.5px;
+  }
+  .about-grid p:last-child{ margin-bottom: 0; }
+  .about-grid strong{ color: var(--text); font-weight: 500; }
+
+  .fact-list{
+    border-left: 1px solid var(--line);
+    padding-left: 24px;
+    display:flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .fact{
+    display:flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .fact-label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+  }
+  .fact-value{
+    font-size: 15px;
+    color: var(--text);
+  }
+  .fact-value .accent{ color: var(--accent); }
+
+  /* education */
+  .edu-item{
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 24px;
+    padding: 22px 0;
+    border-top: 1px solid var(--line);
+  }
+  .edu-item:first-child{ border-top: none; }
+  .edu-year{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-faint);
+    padding-top: 3px;
+  }
+  .edu-title{
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+  .edu-desc{
+    font-size: 14.5px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .tag{
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    padding: 2px 8px;
+    border-radius: var(--radius);
+    margin-top: 10px;
+  }
+
+  /* mobility timeline */
+  .route{
+    position: relative;
+    padding-left: 30px;
+  }
+  .route::before{
+    content:"";
+    position:absolute;
+    left: 5px; top: 6px; bottom: 6px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), var(--line) 85%);
+  }
+  .stop{
+    position: relative;
+    padding-bottom: 40px;
+  }
+  .stop:last-child{ padding-bottom: 0; }
+  .stop::before{
+    content:"";
+    position:absolute;
+    left: -30px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+  .stop.planned::before{
+    border-color: var(--text-faint);
+  }
+  .stop-head{
+    display:flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .stop-place{
+    font-family: 'Newsreader', serif;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  .stop-when{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+  .stop-desc{
+    color: var(--text-muted);
+    font-size: 14.5px;
+    max-width: 560px;
+    margin: 0;
+  }
+  .status-pill{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: var(--radius);
+    margin-left: 10px;
+  }
+  .status-pill.planned{ color: var(--text-faint); border: 1px solid var(--line); }
+  .status-pill.target{ color: var(--accent-warm); border: 1px solid rgba(232,162,76,0.4); }
+
+  /* focus areas */
+  .focus-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .focus-card{
+    background: var(--bg);
+    padding: 28px;
+  }
+  .focus-card h3{
+    font-family: 'Newsreader', serif;
+    font-weight: 500;
+    font-size: 18px;
+    margin: 0 0 10px;
+  }
+  .focus-card p{
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .focus-card .idx{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    display:block;
+    margin-bottom: 12px;
+  }
+
+  /* languages */
+  .lang-list{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 460px;
+  }
+  .lang-row{
+    display: grid;
+    grid-template-columns: 130px 1fr 50px;
+    align-items: center;
+    gap: 16px;
+  }
+  .lang-name{ font-size: 14.5px; }
+  .lang-level{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-faint);
+    text-align: right;
+  }
+  .lang-bar{
+    height: 3px;
+    background: var(--line);
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .lang-bar i{
+    position:absolute; left:0; top:0; bottom:0;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* contact */
+  .contact-block{
+    display:flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+  .contact-block h2{
+    font-family: 'Newsreader', serif;
+    font-size: clamp(30px, 5vw, 44px);
+    font-weight: 500;
+    margin: 0;
+    max-width: 480px;
+    line-height: 1.15;
+  }
+  .contact-links{
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .contact-links a{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    text-decoration:none;
+    color: var(--text-muted);
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    padding-bottom: 2px;
+  }
+  .contact-links a:hover{
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  footer{
+    padding: 30px 0 50px;
+  }
+  footer .wrap{
+    display:flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-faint);
+  }
+
+  /* focus visible */
+  a:focus-visible, button:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 720px){
+    .about-grid{ grid-template-columns: 1fr; gap: 36px; }
+    .fact-list{ border-left: none; padding-left: 0; border-top: 1px solid var(--line); padding-top: 24px; }
+    .edu-item{ grid-template-columns: 1fr; gap: 6px; }
+    .focus-grid{ grid-template-columns: 1fr; }
+    nav ul{ gap: 16px; }
+    nav ul li:nth-child(n+4){ display:none; }
+    .lang-row{ grid-template-columns: 90px 1fr 42px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scanlines" aria-hidden="true"></div>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">UMESH KUMAR <strong>·</strong> MED</div>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#mobility">Mobility</a></li>
+      <li><a href="#focus">Focus</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="sweep" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="eyebrow">Medical Student · Class of 2031</div>
+    <h1>Umesh Kumar<br><em>Radiology &amp; Nuclear Medicine</em></h1>
+    <p class="lede">Training in Medicine and Surgery at Università degli Studi della Campania Luigi Vanvitelli, Naples — building toward a specialisation in diagnostic imaging and nuclear medicine in Germany.</p>
+    <div class="hero-meta mono">
+      <span><b>Base</b> Naples, Italy</span>
+      <span><b>Programme</b> IMS, Medicine &amp; Surgery</span>
+      <span><b>Target</b> Radiology / Nuclear Medicine — Berlin</span>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num mono">01</span>
+      <h2 class="section-title">About</h2>
+    </div>
+    <div class="about-grid">
+      <div>
+        <p>I'm a medical student at <strong>Vanvitelli</strong> in Naples, working toward a career in diagnostic imaging. My interest in <strong>radiology and nuclear medicine</strong> is what shapes most of the decisions in my training — which electives I take, which hospitals I want exposure to, and which country I eventually want to specialise in.</p>
+        <p>Before medicine, I worked as an <strong>English tutor</strong>, which is where a lot of my comfort with teaching and explaining complex material comes from — something I expect to carry into clinical teaching later on.</p>
+        <p>My long-term plan is to build toward a residency in <strong>Berlin</strong>, using the years ahead to gain real exposure to German clinical training well before I apply — through structured exchanges and, later, targeted clinical placements in the specialty itself.</p>
+      </div>
+      <div class="fact-list">
+        <div class="fact">
+          <span class="fact-label">Currently</span>
+          <span class="fact-value">Medicine &amp; Surgery, <span class="accent">Vanvitelli</span></span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">English</span>
+          <span class="fact-value">IELTS Academic — Band 7.0 (C1)</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Interest</span>
+          <span class="fact-value">Diagnostic &amp; Nuclear Imaging</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Career target</span>
+          <span class="fact-value">Facharzt, <span class="accent">Berlin</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="education">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num mono">02</span>
+      <h2 class="section-title">Education</h2>
+    </div>
+
+    <div class="edu-item">
+      <div class="edu-year mono">2025 —</div>
+      <div>
+        <p class="edu-title">Laurea Magistrale in Medicina e Chirurgia (IMS)</p>
+        <p class="edu-desc">Università degli Studi della Campania Luigi Vanvitelli — Naples, Italy. Single-cycle, English-taught programme, city-centre campus.</p>
+      </div>
+    </div>
+
+    <div class="edu-item">
+      <div class="edu-year mono">Pre-med</div>
+      <div>
+        <p class="edu-title">IMAT — International Medical Admissions Test</p>
+        <p class="edu-desc">Admissions preparation across biology, chemistry, physics, logical reasoning, and general knowledge.</p>
+      </div>
+    </div>
+
+    <div class="edu-item">
+      <div class="edu-year mono">Language</div>
+      <div>
+        <p class="edu-title">IELTS Academic — Band 7.0</p>
+        <p class="edu-desc">Overall CEFR C1. Satisfies the English-proficiency requirement for the Vanvitelli IMS programme.</p>
+        <span class="tag">C1 English</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="mobility">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num mono">03</span>
+      <h2 class="section-title">International mobility</h2>
+    </div>
+
+    <div class="route">
+
+      <div class="stop">
+        <div class="stop-head">
+          <span class="stop-place">Naples, Italy <span class="status-pill planned mono">Home base</span></span>
+          <span class="stop-when mono">Year 1 – 6</span>
+        </div>
+        <p class="stop-desc">Università degli Studi della Campania Luigi Vanvitelli. Core medical training, IMS programme.</p>
+      </div>
+
+      <div class="stop planned">
+        <div class="stop-head">
+          <span class="stop-place">Patras, Greece <span class="status-pill planned mono">Planned</span></span>
+          <span class="stop-when mono">Year 2 · 11 months</span>
+        </div>
+        <p class="stop-desc">Erasmus+ study exchange, University of Patras Medical School — English-taught coursework.</p>
+      </div>
+
+      <div class="stop planned">
+        <div class="stop-head">
+          <span class="stop-place">Tübingen, Germany <span class="status-pill planned mono">Planned</span></span>
+          <span class="stop-when mono">Year 3 · 9 months</span>
+        </div>
+        <p class="stop-desc">Erasmus+ study exchange, Eberhard Karls Universität Tübingen — German-language immersion and clinical foundations.</p>
+      </div>
+
+      <div class="stop planned">
+        <div class="stop-head">
+          <span class="stop-place">Köln, Germany <span class="status-pill planned mono">Planned</span></span>
+          <span class="stop-when mono">Year 5 – 6 · ~4 months</span>
+        </div>
+        <p class="stop-desc">Erasmus+ clinical traineeship (Famulatur), targeting radiology and nuclear medicine departments.</p>
+      </div>
+
+      <div class="stop planned">
+        <div class="stop-head">
+          <span class="stop-place">Berlin, Germany <span class="status-pill target mono">Target</span></span>
+          <span class="stop-when mono">Post-graduation</span>
+        </div>
+        <p class="stop-desc">Facharzt residency in Radiology or Nuclear Medicine.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="focus">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num mono">04</span>
+      <h2 class="section-title">Areas of focus</h2>
+    </div>
+    <div class="focus-grid">
+      <div class="focus-card">
+        <span class="idx mono">IMG · 01</span>
+        <h3>Diagnostic Imaging</h3>
+        <p>CT, MRI, and ultrasound as core diagnostic tools — building foundational familiarity ahead of clinical rotations.</p>
+      </div>
+      <div class="focus-card">
+        <span class="idx mono">IMG · 02</span>
+        <h3>Nuclear Medicine</h3>
+        <p>PET/CT, SPECT, and radionuclide therapy — a particular interest within imaging, and the intended specialisation.</p>
+      </div>
+      <div class="focus-card">
+        <span class="idx mono">IMG · 03</span>
+        <h3>Clinical German</h3>
+        <p>Building working medical German ahead of clinical exposure in Tübingen and later, residency in Berlin.</p>
+      </div>
+      <div class="focus-card">
+        <span class="idx mono">IMG · 04</span>
+        <h3>Teaching</h3>
+        <p>Background as an English tutor — an ongoing interest in clear medical communication and future clinical teaching.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="languages">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num mono">05</span>
+      <h2 class="section-title">Languages</h2>
+    </div>
+    <div class="lang-list">
+      <div class="lang-row">
+        <span class="lang-name">English</span>
+        <span class="lang-bar"><i style="width:95%"></i></span>
+        <span class="lang-level mono">C1</span>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">Italian</span>
+        <span class="lang-bar"><i style="width:45%"></i></span>
+        <span class="lang-level mono">A2–B1</span>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">German</span>
+        <span class="lang-bar"><i style="width:25%"></i></span>
+        <span class="lang-level mono">A1–A2</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num mono">06</span>
+      <h2 class="section-title">Contact</h2>
+    </div>
+    <div class="contact-block">
+      <h2>Open to conversations on radiology, nuclear medicine, and studying medicine internationally.</h2>
+      <div class="contact-links">
+        <a href="mailto:your.email@example.com">your.email@example.com</a>
+        <a href="#">linkedin.com/in/yourname</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Umesh Kumar</span>
+    <span>Naples · Patras · Tübingen · Köln · Berlin</span>
+  </div>
+</footer>
+
+</body>
+</html>
