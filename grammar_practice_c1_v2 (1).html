@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Marginalia II — C1 Grammar Drills</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --ink:#1e2230;
+    --ink-2:#2a2f42;
+    --paper:#f7f2e7;
+    --paper-2:#efe8d8;
+    --rule:#c7bda4;
+    --oxblood:#7a3030;
+    --oxblood-2:#9c4444;
+    --moss:#3f6b4f;
+    --moss-2:#5a8a68;
+    --ink-text:#2b2a24;
+    --muted:#8a8674;
+    --gold:#b08a3e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Iowan Old Style','Palatino Linotype',Georgia,serif;
+    background:var(--ink);
+    color:var(--ink-text);
+    display:flex;
+    min-height:100vh;
+  }
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:290px;
+    flex-shrink:0;
+    background:linear-gradient(180deg,var(--ink) 0%, var(--ink-2) 100%);
+    color:#e9e3d0;
+    padding:34px 26px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    border-right:1px solid #000;
+  }
+  .eyebrow{
+    font-family:'Courier New',monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    color:var(--gold);
+    margin-bottom:10px;
+  }
+  .brand{
+    font-size:30px;
+    line-height:1.1;
+    font-weight:600;
+    margin:0 0 6px;
+    font-style:italic;
+  }
+  .brand small{
+    display:block;
+    font-size:13px;
+    font-style:normal;
+    color:#a8a190;
+    font-family:'Courier New',monospace;
+    letter-spacing:.03em;
+    margin-top:8px;
+  }
+  .score-box{
+    margin-top:28px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:2px;
+    padding:18px 18px 20px;
+  }
+  .score-label{
+    font-family:'Courier New',monospace;
+    font-size:10px;
+    letter-spacing:.16em;
+    color:#a8a190;
+  }
+  .score-num{
+    font-size:34px;
+    margin:6px 0 10px;
+    font-weight:600;
+  }
+  .score-num span{color:var(--gold);}
+  .score-bar-track{
+    height:4px;
+    background:rgba(255,255,255,0.12);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .score-bar-fill{
+    height:100%;
+    background:var(--gold);
+    width:0%;
+    transition:width .4s ease;
+  }
+  .topics-label{
+    font-family:'Courier New',monospace;
+    font-size:10px;
+    letter-spacing:.16em;
+    color:#a8a190;
+    margin:30px 0 12px;
+  }
+  .topic-item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:13px 12px;
+    border-radius:2px;
+    cursor:pointer;
+    margin-bottom:4px;
+    border:1px solid transparent;
+    transition:background .15s, border-color .15s;
+  }
+  .topic-item:hover{background:rgba(255,255,255,0.05);}
+  .topic-item.active{
+    background:rgba(176,138,62,0.12);
+    border-color:var(--gold);
+  }
+  .topic-badge{
+    width:34px;height:34px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.25);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Courier New',monospace;
+    font-size:13px;
+    color:#e9e3d0;
+    flex-shrink:0;
+  }
+  .topic-item.active .topic-badge{
+    border-color:var(--gold);
+    color:var(--gold);
+  }
+  .topic-item.done .topic-badge{
+    background:var(--moss-2);
+    border-color:var(--moss-2);
+    color:#0e1a12;
+  }
+  .topic-name{font-weight:600;font-size:15px;}
+  .topic-sub{font-family:'Courier New',monospace;font-size:10.5px;color:#a8a190;margin-top:2px;letter-spacing:.03em;}
+
+  /* ---------- MAIN ---------- */
+  .main{
+    flex:1;
+    background:var(--paper);
+    min-height:100vh;
+    position:relative;
+  }
+  .margin-rule{
+    position:absolute;
+    left:64px;
+    top:0;
+    bottom:0;
+    width:1px;
+    background:repeating-linear-gradient(180deg,var(--rule) 0 10px, transparent 10px 18px);
+    opacity:.6;
+  }
+  .content{
+    max-width:800px;
+    margin:0 auto;
+    padding:56px 70px 100px 96px;
+  }
+  .part-tag{
+    font-family:'Courier New',monospace;
+    font-size:11px;
+    letter-spacing:.2em;
+    color:var(--oxblood);
+    margin-bottom:10px;
+  }
+  h1.title{
+    font-size:46px;
+    margin:0 0 14px;
+    font-weight:700;
+    letter-spacing:-.01em;
+  }
+  .desc{
+    font-size:17px;
+    color:#5a5646;
+    max-width:60ch;
+    margin:0 0 26px;
+    font-style:italic;
+  }
+  .hr{
+    height:1px;
+    background:var(--rule);
+    margin-bottom:34px;
+  }
+  .qcard{
+    background:var(--paper-2);
+    border:1px solid var(--rule);
+    border-radius:2px;
+    padding:32px 34px 28px;
+    margin-bottom:26px;
+    position:relative;
+  }
+  .qnum{
+    display:inline-block;
+    font-family:'Courier New',monospace;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.05em;
+    background:var(--ink);
+    color:var(--gold);
+    padding:5px 12px;
+    border-radius:2px;
+    margin-bottom:18px;
+  }
+  .qtext{
+    font-size:20px;
+    line-height:1.55;
+    margin:0 0 22px;
+  }
+  .qtext .blank{
+    display:inline-block;
+    min-width:110px;
+    border-bottom:2px solid var(--gold);
+    margin:0 3px;
+  }
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:14px 18px;
+    border:1px solid var(--rule);
+    border-radius:2px;
+    margin-bottom:10px;
+    cursor:pointer;
+    background:var(--paper);
+    transition:border-color .12s, background .12s, transform .08s;
+    font-size:16px;
+  }
+  .opt:hover{border-color:var(--gold);}
+  .opt .letter{
+    width:28px;height:28px;
+    border-radius:50%;
+    border:1px solid var(--rule);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Courier New',monospace;
+    font-size:12px;
+    flex-shrink:0;
+    color:#5a5646;
+  }
+  .opt.correct{
+    border-color:var(--moss);
+    background:rgba(63,107,79,0.1);
+  }
+  .opt.correct .letter{background:var(--moss);border-color:var(--moss);color:#fff;}
+  .opt.wrong{
+    border-color:var(--oxblood);
+    background:rgba(122,48,48,0.08);
+  }
+  .opt.wrong .letter{background:var(--oxblood);border-color:var(--oxblood);color:#fff;}
+  .opt.disabled{cursor:default;}
+  .opt.disabled:not(.correct):not(.wrong){opacity:.55;}
+  .note{
+    font-family:'Courier New',monospace;
+    font-size:13px;
+    color:var(--muted);
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px dashed var(--rule);
+    display:none;
+  }
+  .note.show{display:block;}
+  .note b{color:var(--ink-text);}
+  .topic-footer{
+    text-align:center;
+    padding:20px 0 60px;
+    color:var(--muted);
+    font-family:'Courier New',monospace;
+    font-size:13px;
+  }
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:var(--ink);}
+  ::-webkit-scrollbar-thumb{background:#3a4054;border-radius:5px;}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="eyebrow">C1 · SET II</div>
+  <h1 class="brand">Marginalia<small>Five topics, five questions each — advanced usage only</small></h1>
+
+  <div class="score-box">
+    <div class="score-label">TOTAL SCORE</div>
+    <div class="score-num" id="totalScoreDisplay"><span id="scoreVal">0</span> / 25</div>
+    <div class="score-bar-track"><div class="score-bar-fill" id="scoreBar"></div></div>
+  </div>
+
+  <div class="topics-label">TOPICS</div>
+  <div id="topicList"></div>
+</div>
+
+<div class="main">
+  <div class="margin-rule"></div>
+  <div class="content" id="content"></div>
+</div>
+
+<script>
+const TOPICS = [
+  {
+    key:"conditionals", tag:"PART A", name:"Conditionals",
+    title:"Conditionals", sub:"5 Qs",
+    desc:"Mixed and unreal conditional forms used to reason about hypothetical outcomes and regrets.",
+    questions:[
+      {q:"Had the negotiations [[collapsed]] at that stage, the merger would never have gone through.",
+       opts:["collapsed","collapse","been collapsing","been collapsed"],a:0,
+       note:"Inverted third conditional: Had + subject + past participle, ... would have + past participle."},
+      {q:"I'd rather you [[didn't mention]] the layoffs until the announcement is official.",
+       opts:["don't mention","didn't mention","hadn't mentioned","won't mention"],a:1,
+       note:"'I'd rather you' + past simple expresses a present/future preference about someone else's action."},
+      {q:"Were the board to [[reject]] the proposal, the entire funding round would collapse.",
+       opts:["reject","rejects","rejected","have rejected"],a:0,
+       note:"'Were + subject + to + infinitive' is a formal inverted second conditional."},
+      {q:"He behaves as though he [[had]] never made a mistake in his life.",
+       opts:["has","had","would have","having"],a:1,
+       note:"'As though' + past perfect describes an unreal past situation."},
+      {q:"Supposing the deadline [[were]] moved forward, would the team still be able to deliver?",
+       opts:["is","was","were","had been"],a:2,
+       note:"'Supposing' introduces a hypothetical much like 'if'; formal register favours 'were' for all persons."}
+    ]
+  },
+  {
+    key:"prepositions", tag:"PART B", name:"Prepositions",
+    title:"Prepositions", sub:"5 Qs",
+    desc:"Dependent prepositions and fixed collocations typical of formal, analytical writing.",
+    questions:[
+      {q:"The union has consistently [[objected to]] the proposed changes in working hours.",
+       opts:["objected on","objected to","objected for","objected with"],a:1,
+       note:"'Object to' something is the fixed dependent-preposition pattern."},
+      {q:"The findings of the study [[coincide with]] earlier research conducted in the 1990s.",
+       opts:["coincide to","coincide with","coincide on","coincide for"],a:1,
+       note:"'Coincide with' means to match or agree with something else."},
+      {q:"The minister was accused of failing to [[account for]] the missing funds.",
+       opts:["account of","account for","account with","account on"],a:1,
+       note:"'Account for' something means to explain or justify it."},
+      {q:"The new policy has been widely [[criticised for]] its lack of transparency.",
+       opts:["criticised of","criticised for","criticised on","criticised with"],a:1,
+       note:"'Criticise someone/something FOR a reason' is the standard pattern."},
+      {q:"The professor's theory was eventually [[substituted by]] a more rigorous model.",
+       opts:["substituted for","substituted by","substituted with","substituted on"],a:1,
+       note:"'Substitute A BY B' (passive) — B replaces A; note the related active form 'substitute B for A'."}
+    ]
+  },
+  {
+    key:"conjunctions", tag:"PART C", name:"Conjunctions",
+    title:"Subordinate Conjunctions", sub:"5 Qs",
+    desc:"Connectors of contrast, concession, purpose, and result used in formal argumentative writing.",
+    questions:[
+      {q:"[[In as much as]] the data supports the hypothesis, further trials are still warranted.",
+       opts:["In as much as","So that","Whereas","Unless"],a:0,
+       note:"'In as much as' (also 'inasmuch as') means 'to the extent that' — a formal qualifying connector."},
+      {q:"The team pressed ahead with the launch, [[all the same]] the risks it entailed.",
+       opts:["despite","all the same","whereas","given"],a:1,
+       note:"'All the same' functions adverbially to mean 'nevertheless', linking two contrasting ideas."},
+      {q:"[[Such was]] the impact of the report that the minister resigned within days.",
+       opts:["Such was","So that","Given that","Whereas"],a:0,
+       note:"'Such was + noun + that' is an emphatic fronted structure expressing extreme degree or result."},
+      {q:"The plan was approved [[on condition that]] a full audit be conducted within six months.",
+       opts:["on condition that","in case","so as to","whereby"],a:0,
+       note:"'On condition that' introduces a stipulated requirement attached to an agreement."},
+      {q:"[[However]] compelling the argument seemed, the panel remained unconvinced.",
+       opts:["However","Whereas","Notwithstanding","Provided"],a:0,
+       note:"'However' + adjective + subject + verb is a concessive structure meaning 'no matter how'."}
+    ]
+  },
+  {
+    key:"tenses", tag:"PART D", name:"Tenses",
+    title:"Tenses", sub:"5 Qs",
+    desc:"Perfect and continuous aspects, narrative sequencing, and modal perfects in advanced usage.",
+    questions:[
+      {q:"By the time the final witness testified, the jury [[had been deliberating]] for nearly a week already.",
+       opts:["deliberated","had deliberated","had been deliberating","were deliberating"],a:2,
+       note:"Past perfect continuous stresses the ongoing duration of an action before another past point."},
+      {q:"She [[should have been informed]] about the change in policy long before the meeting.",
+       opts:["should inform","should have informed","should have been informed","should be informed"],a:2,
+       note:"Passive perfect modal expresses criticism about something that should have happened but didn't."},
+      {q:"This time next month, the renovation team [[will have completed]] the entire east wing.",
+       opts:["will complete","will have completed","will be completing","completes"],a:1,
+       note:"Future perfect marks completion of an action before a specified future time."},
+      {q:"He claimed that he [[had been trying]] to reach the office all morning before the call finally connected.",
+       opts:["was trying","had tried","had been trying","has been trying"],a:2,
+       note:"Past perfect continuous in reported speech emphasises a repeated or ongoing attempt before another past event."},
+      {q:"The exhibition, which [[had originally been intended]] as a temporary display, remained open for a decade.",
+       opts:["was originally intended","had originally been intended","has originally been intended","originally intended"],a:1,
+       note:"Past perfect passive situates the original plan before the later, contrasting outcome."}
+    ]
+  },
+  {
+    key:"inversion", tag:"PART E", name:"Inversion",
+    title:"Inversion", sub:"5 Qs",
+    desc:"Fronted negative, restrictive, and emphatic structures that trigger subject–auxiliary inversion.",
+    questions:[
+      {q:"[[On no account]] should this data be shared without prior authorisation.",
+       opts:["On no account","Not until","Only when","Given that"],a:0,
+       note:"'On no account' fronted for emphasis requires inversion, similar to 'under no circumstances'."},
+      {q:"[[So great]] was the public outcry that the policy was withdrawn within a week.",
+       opts:["So great","Such great","Very great","Great as"],a:0,
+       note:"'So + adjective + was/were + subject + that' is an emphatic inverted result structure."},
+      {q:"[[Not since]] the 2008 crisis had the markets experienced such volatility.",
+       opts:["Not since","No sooner","Only after","Rarely"],a:0,
+       note:"'Not since + time reference' fronted triggers inversion, paired with the past perfect."},
+      {q:"[[Only by]] working through the night did the team manage to meet the deadline.",
+       opts:["Only by","Not only","Even though","Provided"],a:0,
+       note:"'Only by + gerund' fronted requires inversion in the following main clause."},
+      {q:"[[Nowhere]] is this tension more evident than in the company's latest earnings report.",
+       opts:["Nowhere","Not only","Hardly","Little"],a:0,
+       note:"Fronted place adverbials of restriction like 'nowhere' also trigger subject–auxiliary inversion."}
+    ]
+  }
+];
+
+// Shuffle each question's options (Fisher–Yates) so the correct answer's
+// letter position is randomised and carries no predictable pattern.
+function shuffleArray(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+TOPICS.forEach(t=>{
+  t.questions.forEach(q=>{
+    const correctText = q.opts[q.a];
+    shuffleArray(q.opts);
+    q.a = q.opts.indexOf(correctText);
+  });
+});
+
+let currentTopic = 0;
+let answered = {};
+let totalScore = 0;
+let lastWrong = {};
+
+TOPICS.forEach(t=> answered[t.key] = new Array(t.questions.length).fill(null));
+
+function renderSidebar(){
+  const list = document.getElementById('topicList');
+  list.innerHTML = '';
+  TOPICS.forEach((t,i)=>{
+    const scored = answered[t.key].filter(v=>v===true).length;
+    const done = answered[t.key].every(v=>v!==null);
+    const div = document.createElement('div');
+    div.className = 'topic-item' + (i===currentTopic?' active':'') + (done?' done':'');
+    div.onclick = ()=>{ currentTopic=i; render(); };
+    div.innerHTML = `
+      <div class="topic-badge">${scored}</div>
+      <div>
+        <div class="topic-name">${t.name}</div>
+        <div class="topic-sub">${t.tag} · ${t.sub}</div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function updateScore(){
+  totalScore = 0;
+  TOPICS.forEach(t=>{
+    totalScore += answered[t.key].filter(v=>v===true).length;
+  });
+  document.getElementById('scoreVal').textContent = totalScore;
+  document.getElementById('scoreBar').style.width = (totalScore/25*100)+'%';
+}
+
+function parseQ(qstr){
+  return qstr.split(/\[\[(.*?)\]\]/);
+}
+
+function render(){
+  const t = TOPICS[currentTopic];
+  const content = document.getElementById('content');
+  let html = `
+    <div class="part-tag">${t.tag}</div>
+    <h1 class="title">${t.title}</h1>
+    <p class="desc">${t.desc}</p>
+    <div class="hr"></div>`;
+
+  t.questions.forEach((q,qi)=>{
+    const parts = parseQ(q.q);
+    const state = answered[t.key][qi];
+    let qtextHtml = '';
+    parts.forEach((p,pi)=>{
+      if(pi%2===1){
+        qtextHtml += state===null ? '<span class="blank">&nbsp;</span>' : `<span class="blank"><b>${p}</b></span>`;
+      } else {
+        qtextHtml += p;
+      }
+    });
+
+    html += `<div class="qcard">
+      <div class="qnum">Q${qi+1}</div>
+      <p class="qtext">${qtextHtml}</p>
+      <div class="opts" id="opts-${t.key}-${qi}">`;
+
+    q.opts.forEach((opt,oi)=>{
+      let cls='opt';
+      if(state!==null){
+        cls += ' disabled';
+        if(oi===q.a) cls += ' correct';
+        else if(state===false && oi===lastWrong[t.key+"-"+qi]) cls += ' wrong';
+      }
+      html += `<div class="${cls}" data-topic="${t.key}" data-qi="${qi}" data-oi="${oi}" onclick="selectOption(this)">
+        <div class="letter">${String.fromCharCode(65+oi)}</div>
+        <div>${opt}</div>
+      </div>`;
+    });
+
+    html += `</div><div class="note ${state!==null?'show':''}"><b>Why:</b> ${q.note}</div></div>`;
+  });
+
+  html += `<div class="topic-footer">— end of ${t.title} · ${t.sub} —</div>`;
+  content.innerHTML = html;
+  renderSidebar();
+  updateScore();
+}
+
+function selectOption(el){
+  const topicKey = el.dataset.topic;
+  const qi = parseInt(el.dataset.qi);
+  const oi = parseInt(el.dataset.oi);
+  if(answered[topicKey][qi] !== null) return;
+
+  const t = TOPICS.find(x=>x.key===topicKey);
+  const correct = (oi === t.questions[qi].a);
+  answered[topicKey][qi] = correct;
+  if(!correct) lastWrong[topicKey+"-"+qi] = oi;
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
