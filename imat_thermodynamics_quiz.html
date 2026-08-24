@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMAT Thermodynamics Quiz — Second Session 2024</title>
+<style>
+  :root{
+    --cold:#1e3a5f;
+    --cold2:#2f5d8a;
+    --mid:#c96a3c;
+    --hot:#e0472b;
+    --hot2:#f2825a;
+    --ink:#1b1a17;
+    --paper:#f6f1e6;
+    --paper2:#eee6d4;
+    --line:#d8cdb3;
+    --good:#2f7d5a;
+    --bad:#b0392c;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --serif: 'Iowan Old Style','Georgia','Times New Roman', serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top left, rgba(224,71,43,0.08), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(47,93,138,0.10), transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    min-height:100vh;
+    padding:36px 18px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+
+  /* Header */
+  header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:18px;
+    border-bottom:3px solid var(--ink);
+    padding-bottom:14px;
+    margin-bottom:8px;
+    flex-wrap:wrap;
+  }
+  .kicker{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--hot);
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(26px,4.2vw,38px);
+    margin:0;
+    line-height:1.05;
+    letter-spacing:-0.01em;
+  }
+  h1 em{font-style:italic; color:var(--cold2);}
+  .meta{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:#6b6455;
+    text-align:right;
+    line-height:1.6;
+  }
+
+  /* Thermometer progress */
+  .therm-row{
+    display:flex; align-items:center; gap:14px;
+    margin:22px 0 30px;
+  }
+  .therm-track{
+    flex:1;
+    height:14px;
+    background:var(--paper2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    position:relative;
+    overflow:hidden;
+  }
+  .therm-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--cold2),var(--mid) 55%,var(--hot));
+    transition:width .5s cubic-bezier(.4,0,.2,1);
+    border-radius:8px;
+  }
+  .therm-label{
+    font-family:var(--mono);
+    font-size:12px;
+    white-space:nowrap;
+    color:#54503f;
+    min-width:74px;
+    text-align:right;
+  }
+
+  /* Score readout */
+  .score-strip{
+    display:none;
+    font-family:var(--mono);
+    font-size:12px;
+    color:#54503f;
+    letter-spacing:.03em;
+    margin:-16px 0 26px;
+    display:none;
+  }
+  .score-strip.show{display:block;}
+  .score-strip b{color:var(--ink);}
+
+  /* Question card */
+  .card{
+    background:#fffdf8;
+    border:1px solid var(--line);
+    border-left:4px solid var(--cold2);
+    border-radius:2px;
+    padding:26px 28px 24px;
+    margin-bottom:22px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.02);
+    transition:border-color .25s ease;
+  }
+  .card.answered.correct{border-left-color:var(--good);}
+  .card.answered.wrong{border-left-color:var(--bad);}
+
+  .qnum{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--hot);
+    letter-spacing:.08em;
+    margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+  }
+  .qnum span.tag{color:#9a9280;}
+
+  .qtext{
+    font-size:17px;
+    line-height:1.5;
+    margin:0 0 18px;
+    color:var(--ink);
+  }
+
+  .options{list-style:none; margin:0; padding:0; display:grid; gap:9px;}
+  .opt{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:11px 14px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:var(--paper);
+    cursor:pointer;
+    font-size:15px;
+    line-height:1.4;
+    transition:background .15s ease, border-color .15s ease, transform .1s ease;
+  }
+  .opt:hover{border-color:var(--cold2); background:#f1ece0;}
+  .opt .letter{
+    font-family:var(--mono);
+    font-size:12px;
+    font-weight:700;
+    color:#8a8370;
+    border:1px solid #c9c0a7;
+    border-radius:50%;
+    width:20px;height:20px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    margin-top:1px;
+    background:#fffdf8;
+  }
+
+  .card.locked .opt{cursor:default;}
+  .card.locked .opt:hover{background:var(--paper); border-color:var(--line);}
+
+  .opt.chosen-correct{background:#e8f3ec; border-color:var(--good);}
+  .opt.chosen-correct .letter{background:var(--good); border-color:var(--good); color:#fff;}
+  .opt.chosen-wrong{background:#fbeae7; border-color:var(--bad);}
+  .opt.chosen-wrong .letter{background:var(--bad); border-color:var(--bad); color:#fff;}
+  .opt.reveal-correct{background:#e8f3ec; border-color:var(--good);}
+  .opt.reveal-correct .letter{background:var(--good); border-color:var(--good); color:#fff;}
+  .opt.dim{opacity:.55;}
+
+  .feedback{
+    margin-top:14px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    padding-top:12px;
+    border-top:1px dashed var(--line);
+    display:none;
+  }
+  .card.answered .feedback{display:block;}
+  .feedback .verdict{font-weight:700; letter-spacing:.03em;}
+  .feedback .verdict.good{color:var(--good);}
+  .feedback .verdict.bad{color:var(--bad);}
+
+  /* Final panel */
+  .final{
+    display:none;
+    text-align:center;
+    padding:40px 24px;
+    border:2px solid var(--ink);
+    background:#fffdf8;
+    margin-top:10px;
+  }
+  .final.show{display:block;}
+  .final .big{
+    font-family:var(--serif);
+    font-size:52px;
+    font-weight:600;
+    letter-spacing:-0.02em;
+  }
+  .final .sub{
+    font-family:var(--mono);
+    font-size:12px;
+    color:#6b6455;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-top:6px;
+  }
+  .final button{
+    margin-top:22px;
+  }
+
+  button.reset{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:11px 22px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  button.reset:hover{background:#3a3628;}
+
+  footer{
+    text-align:center;
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:#a49c86;
+    margin-top:40px;
+    letter-spacing:.05em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .therm-fill{transition:none;}
+  }
+
+  @media (max-width:520px){
+    .card{padding:20px 16px;}
+    header{flex-direction:column; align-items:flex-start;}
+    .meta{text-align:left;}
+  }
+
+  :focus-visible{outline:2px solid var(--cold2); outline-offset:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <p class="kicker">IMAT Physics · Second Session 2024</p>
+      <h1>Thermo&shy;dynamics<br><em>Question Bank</em></h1>
+    </div>
+    <div class="meta">
+      58 questions extracted<br>
+      Heat · gas laws · entropy<br>
+      Options re-shuffled per run
+    </div>
+  </header>
+
+  <div class="therm-row">
+    <div class="therm-track"><div class="therm-fill" id="thermFill"></div></div>
+    <div class="therm-label" id="thermLabel">0 / 35</div>
+  </div>
+
+  <div class="score-strip" id="scoreStrip"></div>
+
+  <div id="quiz"></div>
+
+  <div class="final" id="finalPanel">
+    <div class="big" id="finalScore">0 / 35</div>
+    <div class="sub" id="finalNote">recalibrate and try again</div>
+    <button class="reset" id="resetBtn">Reshuffle &amp; restart</button>
+  </div>
+
+  <footer>Extracted from the uploaded IMAT past-paper PDF · answers per the source key</footer>
+</div>
+
+<script>
+const DATA = [{"num": "148", "q": "How much heat must be supplied to raise the temperature of 50 g of iron from 20 °C to 200 °C? (Specific heat capacity of iron: 0.45 J/g·°C)", "options": ["205.6 N", "4,050 J", "4,050 N", "20,000 J", "1.6 J"], "correct": 1}, {"num": "149", "q": "A 20 g mass of water is heated from 10 °C to 60 °C. How much heat has the water absorbed? (Specific heat capacity of water: 4.18 J/g·°C)", "options": ["1.7 J", "59 N", "239 J", "239 N", "4,180 J"], "correct": 4}, {"num": "181", "q": "Which process involves the transfer of energy between two bodies through the emission and absorption of electromagnetic waves?", "options": ["Conduction", "Evaporation", "Radiation", "Convection", "Sublimation"], "correct": 2}, {"num": "182", "q": "What is the physical meaning of the quantity “entropy” in thermodynamics?", "options": ["The total kinetic energy of a system", "The amount of heat transferred during a process", "A measure of the disorder or randomness in a system", "The change in temperature of a system", "The amount of work done by a system"], "correct": 2}, {"num": "184", "q": "Which ideal-gas law states that, at constant temperature, the product of the gas pressure and the volume it occupies is constant?", "options": ["Gay-Lussac's law", "Dalton's law", "Charles's law", "Avogadro's law", "Boyle's law"], "correct": 4}, {"num": "212", "q": "What is the process of heat transfer through direct contact between two solid bodies at different temperatures called?", "options": ["Absorption", "Thermal radiation", "Radiation", "Conduction", "Convection"], "correct": 3}, {"num": "213", "q": "The mechanism of heat transfer in fluids that involves the motion of the fluid is called:", "options": ["Absorption", "Radiation", "Evaporation", "Conduction", "Convection"], "correct": 4}, {"num": "214", "q": "Which of the following mechanisms allows heat to propagate through a vacuum?", "options": ["Conduction", "Absorption", "Radiation", "Reflection", "Convection"], "correct": 2}, {"num": "215", "q": "Which physical quantity expresses the amount of energy required to increase the temperature of a body by 1 K?", "options": ["Specific heat capacity", "Heat capacity", "Enthalpy", "Latent heat", "Entropy"], "correct": 1}, {"num": "216", "q": "What is the specific heat capacity of 1 kg of a substance that requires 500 J of heat to increase its temperature by 1 K?", "options": ["250 J/(kg·K)", "200 J/(kg·K)", "5,000 J/(kg·K)", "1,000 J/(kg·K)", "500 J/(kg·K)"], "correct": 4}, {"num": "217", "q": "What is the latent heat of fusion of a 2 kg substance that requires 5,000 J of heat to melt completely?", "options": ["250 kJ/kg", "5,000 kJ/kg", "500 kJ/kg", "2.5 kJ/kg", "2,500 kJ/kg"], "correct": 3}, {"num": "237", "q": "A container is filled with water at room temperature (25 °C) and placed in a freezer to cool to -18 °C. The volume of the water is minimum when the water is at:", "options": ["4 °C", "–18 °C", "25 °C", "0 °C", "20 °C"], "correct": 0}, {"num": "238", "q": "At which of the following altitudes does heated water reach boiling point at the lowest temperature?", "options": ["2,000 m", "Sea level", "1,500 m", "400 m", "1,000 m"], "correct": 0}, {"num": "239", "q": "A temperature change of 5 °C is equivalent to:", "options": ["10 °F", "10 K", "5 K", "1,365 K", "1 °F"], "correct": 2}, {"num": "240", "q": "Which of the following materials undergoes the greatest change in volume when subjected to a temperature change of 10 °C?", "options": ["Glass", "Quartz", "Gold", "Aluminium", "Iron"], "correct": 3}, {"num": "241", "q": "In which of the following temperature intervals does the volume of water decrease as its temperature increases?", "options": ["0 °C ; 4 °C", "–3 °C ; 0 °C", "90 °C ; 100 °C", "–100 °C ; 0 °C", "3 °C ; 10 °C"], "correct": 0}, {"num": "242", "q": "Which of the following statements about heat transfer is FALSE?", "options": ["Heat transfer by radiation can also occur in the absence of matter", "A radiator heating a room is an example of heat transfer by convection", "Heat transfer by conduction occurs between bodies in contact", "Heat transfer by convection occurs only between gases", "The Sun heating the Earth is an example of heat transfer by radiation"], "correct": 3}, {"num": "243", "q": "Which of the following phase transitions is the change from the solid state to the gaseous state?", "options": ["Melting", "Liquefaction", "Sublimation", "Evaporation", "Deposition"], "correct": 2}, {"num": "244", "q": "When a body absorbs heat at constant volume, its following quantity certainly increases:", "options": ["speed", "mass", "potential energy", "internal energy", "power"], "correct": 3}, {"num": "245", "q": "The unit of measurement of the ideal gas constant is:", "options": ["J/(mol·K)", "(J·K)/mol", "mol/(J·K)", "(K·mol)/J", "(J·mol)/K"], "correct": 0}, {"num": "246", "q": "A gas cannot be considered ideal if:", "options": ["collisions between its particles and the walls of the container are inelastic", "the motion of its molecules is random", "there are no interactions between its constituent particles", "its constituent particles are identical to one another", "the volume of its constituent molecules is negligible"], "correct": 0}, {"num": "247", "q": "Boyle's law for ideal gases applies to:", "options": ["isobaric processes", "isothermal and isochoric processes", "isochoric processes", "isochoric and isobaric processes", "isothermal processes"], "correct": 4}, {"num": "248", "q": "A thin aluminium rod (coefficient of linear thermal expansion = 24×10⁻⁶ K⁻¹) is 50 cm long at a temperature of 25 °C. The temperature is raised to 35 °C. The length of the rod increases by:", "options": ["25 mm", "0.24 mm", "3.5 cm", "74 mm", "120 mm"], "correct": 4}, {"num": "249", "q": "An ideal gas is enclosed in a rigid-walled container at 27 °C and a pressure of 1.5 atm. The container is then heated and the gas temperature increases by 30 °C. What is the pressure of the gas after heating?", "options": ["1.65 Atm", "2.7 Atm", "1.5 Atm", "1.35 Atm", "1.47 Atm"], "correct": 0}, {"num": "250", "q": "Which of the following equalities between temperature values on different scales is correct?", "options": ["10 °F = 15 °C", "10 K = 278.56 °F", "–273 K = 0 °C", "50 °F = 10 °C", "100 K = 273 °C"], "correct": 3}, {"num": "251", "q": "One litre of water (specific heat capacity 4,186 J/(kg·K)) is heated and its temperature increases from 20 °C to 25 °C. The amount of heat supplied to it is:", "options": ["1.16 MJ", "837.1 J", "104.65 kJ", "20.930 kJ", "4,186 J"], "correct": 3}, {"num": "252", "q": "A 100-litre bathtub is half-filled with water (specific heat capacity 4,186 J/(kg·K)) at 45 °C. After some time, 2,093 kJ has been transferred to the surroundings and the water has therefore cooled to:", "options": ["20 °C", "10 °C", "35 °C", "55 °C", "15 °C"], "correct": 2}, {"num": "253", "q": "A thin aluminium rod (coefficient of linear thermal expansion = 24×10⁻⁶ K⁻¹) is 20 cm long at 20 °C. Following an increase in temperature, the length of the rod increases by 0.05%. What is the final temperature of the rod?", "options": ["200.41 °C", "40.83 °C", "20 °C", "10.5 °C", "11.66 °C"], "correct": 1}, {"num": "486", "q": "An ideal gas in a cylinder is at a pressure of 3 atmospheres and a temperature of 20 °C. The cylinder is left in the sun and the gas reaches a temperature of 40 °C. The pressure of the gas:", "options": ["will increase", "will quadruple", "will remain constant", "will be halved", "will double"], "correct": 0}, {"num": "490", "q": "What does the term “latent heat” mean in thermodynamics?", "options": ["The amount of heat required for 1 kg of a substance to undergo a specified phase transition", "The amount of heat required for 1 kg of a substance to increase in temperature by 10 kelvin", "The amount of work required to completely evaporate 1 kg of water", "The amount of work required to completely evaporate 1 kg of a substance", "The amount of heat required to increase or decrease the temperature of a body by one kelvin"], "correct": 0}, {"num": "499", "q": "A temperature interval of 3 °C is equivalent to:", "options": ["3 K", "1.5 K", "270.15 K", "6 K", "276.15 K"], "correct": 0}, {"num": "508", "q": "A gas undergoes an isobaric process at a pressure of 2 atm. If its initial volume is 4 litres and its final volume is 8 litres, what work is done by the gas during the process?", "options": ["200 J", "0.4 J", "810 J", "1200 J", "8 J"], "correct": 2}, {"num": "509", "q": "To what height must five 40 kg steel beams be lifted by hand to expend the 400 calories consumed by a carpenter at lunch?", "options": ["0.65 m", "0.85 m", "2 m", "20 cm", "140 cm"], "correct": 1}, {"num": "517", "q": "Raising the temperature of 5 kg of an unknown substance from 12 °C to 16 °C requires 48,600 J. What is the specific heat capacity of the substance?", "options": ["35 J/(kg·K)", "3,256 J/(kg·K)", "607.5 J/(kg·K)", "607.5 J/(kg·°C)", "2,430 J/(kg·K)"], "correct": 4}, {"num": "518", "q": "What does the second law of thermodynamics state about heat flow?", "options": ["Heat always flows from a colder body to a hotter body", "Heat flows only in a horizontal direction", "Heat cannot spontaneously flow from a colder body to a hotter body", "Heat cannot be transferred through a vacuum", "Heat can be transferred only through a reversible process"], "correct": 2}, {"num": "519", "q": "What is the natural direction of heat flow between two bodies at different temperatures?", "options": ["From the hotter body to the colder body", "From the colder body to the hotter body", "It depends on the materials of the bodies", "In both directions simultaneously", "There is no heat flow between bodies at different temperatures"], "correct": 0}, {"num": "521", "q": "A gas undergoes an isochoric process at a temperature of 400 K. If 500 J of heat is exchanged during the process, what work is done by the gas?", "options": ["500 J", "5/4 J", "400 J", "0 J", "4/5 J"], "correct": 3}, {"num": "528", "q": "Four moles of CO₂ are at a pressure of 3 atmospheres and a temperature of 10 °C. Given that R = 8.31 J/(mol·K) and 1 atm = 101,300 Pa, what volume does the gas occupy?", "options": ["3.6 m³", "0.031 m³", "3.6 dm³", "26 dm³", "2.7 dm³"], "correct": 1}, {"num": "530", "q": "Sublimation is the transition from the:", "options": ["liquid state to the gaseous state", "solid state to the liquid state", "solid state to the gaseous state", "liquid state to the solid state", "gaseous state to the liquid state"], "correct": 2}, {"num": "552", "q": "The heat capacity of a body is the ratio of:", "options": ["the specific heat capacity to the temperature", "the energy absorbed to the temperature", "the specific heat capacity to the mass", "the heat absorbed to the time interval", "the heat absorbed to the increase in temperature"], "correct": 4}, {"num": "560", "q": "In Miami, temperatures often reach 40 °C on Independence Day, which in US units corresponds to:", "options": ["72 °F", "91 K", "213 K", "approximately –23 °F", "104 °F"], "correct": 4}, {"num": "570", "q": "What is the correct physical definition of heat?", "options": ["The total thermal energy of a system", "The total potential energy of a system", "The internal energy of a system", "The total kinetic energy of a system", "Energy transferred between two bodies at different temperatures"], "correct": 4}, {"num": "574", "q": "Which of the following correctly expresses the Joule effect?", "options": ["The generation of an electric current by a change in magnetic flux", "The generation of an electromotive force by a varying magnetic field", "The generation of a magnetic field by an electric current", "The generation of heat by an electric current passing through a resistive material", "The generation of light by an electric current"], "correct": 3}, {"num": "575", "q": "What is the process by which a gas changes from the gaseous state to the liquid state?", "options": ["Solidification", "Sublimation", "Evaporation", "Melting", "Condensation"], "correct": 4}, {"num": "580", "q": "What happens when two objects at different temperatures are placed in thermal contact and reach thermal equilibrium?", "options": ["Heat stops flowing", "The objects retain their original temperatures", "Heat flows from both objects simultaneously", "Heat flows from the object at the lower temperature to the object at the higher temperature", "Heat flows from the object at the higher temperature to the object at the lower temperature"], "correct": 0}, {"num": "585", "q": "Equal quantities of the same liquid, one at 36 °C and the other at 42 °C, are mixed. Assuming no heat loss, the equilibrium temperature is:", "options": ["40 °C", "38 °C", "greater than 40 °C", "39 °C", "less than 38 °C"], "correct": 3}, {"num": "587", "q": "A cubic container with side length 20 cm is filled with argon gas at 23 °C and a pressure of 5 atmospheres. How many moles are introduced? (Recall that R = 8.31 J/(mol·K) and 1 atm = 101,300 Pa)", "options": ["1.65", "21.2", "1,646.5", "2.63", "1.6×10⁻⁵"], "correct": 0}, {"num": "589", "q": "A sealed container holds an ideal gas at 22 °C. The mean kinetic energy of the gas particles is (recall that the Boltzmann constant is 1.380649 J/K):", "options": ["1.52×10⁻²² J", "4.55×10⁻²² J", "3.02×10⁻²² J", "2.04×10⁻²¹ J", "6.11×10⁻²¹ J"], "correct": 4}, {"num": "606", "q": "Seven moles of carbon dioxide at a pressure of 4 atm and a temperature of 20 °C contain:", "options": ["1.05×10²⁴ molecules", "4.22×10²⁴ molecules", "8.2×10³ molecules", "560 molecules", "1.2×10²⁵ molecules"], "correct": 1}, {"num": "608", "q": "The amount of heat required to melt a mass m of a substance at its melting temperature:", "options": ["does not depend on the type of substance and is directly proportional to the mass", "depends on the type of substance and is inversely proportional to the mass", "does not depend on the type of substance and is inversely proportional to the mass", "depends on the type of substance and is directly proportional to the mass", "depends on the type of substance and on its temperature"], "correct": 3}, {"num": "609", "q": "A small glass of water is placed in a freezer. When the water reaches 0 °C, solidification begins and lasts 50 minutes. During this interval:", "options": ["the temperature of the water continues to decrease at a constant rate", "two states coexist: liquid and gaseous", "two states coexist: solid and gaseous", "the temperature of the water remains constant at 0 °C", "the temperature of the water remains constant at -1 °C"], "correct": 3}, {"num": "613", "q": "A temperature of 100 degrees Fahrenheit corresponds in Celsius to:", "options": ["–45.8 °C", "273 °C", "13.4 °C", "100 °C", "37.8 °C"], "correct": 4}, {"num": "616", "q": "When the vapour pressure becomes equal to the external pressure, a liquid:", "options": ["none of the other answers is correct", "freezes", "boils", "cools", "stops evaporating"], "correct": 2}, {"num": "632", "q": "At constant pressure, if the volume of an ideal gas quadruples, its temperature:", "options": ["remains unchanged because the volume of a gas depends only on temperature", "depends on the number of moles", "quadruples", "becomes one quarter of its initial value", "if the gas is compressed, the pressure must increase and therefore cannot remain constant"], "correct": 2}, {"num": "642", "q": "An ideal gas is enclosed in a container with a movable wall. If, while keeping the temperature T constant, the gas is allowed to expand slowly until it occupies three times its initial volume:", "options": ["the pressure exerted by the gas becomes one third of its initial value", "the internal temperature increases", "the pressure exerted by the gas remains the same", "the pressure exerted by the gas triples relative to its initial value", "the internal temperature decreases"], "correct": 0}, {"num": "647", "q": "A thermodynamic system receives 4 J of heat from its surroundings and simultaneously does an equal amount of work on the surroundings. The change in the internal energy of the system is:", "options": ["none of the other answers is correct", "–4 J", "+4 J", "0", "+8 J"], "correct": 3}, {"num": "648", "q": "Approximately how many calories must be supplied to 6 litres of water to raise its temperature from 14.5 °C to 17.5 °C?", "options": ["300", "1,800", "18,000", "600", "6,000"], "correct": 2}, {"num": "653", "q": "An ideal gas is contained in a vessel of volume 9 m³ at a pressure of 0.1 MPa. At constant temperature, if the pressure becomes 0.3 MPa, how does the volume change?", "options": ["It is halved", "3 m³", "27 m³", "There is insufficient information to answer", "9 m³"], "correct": 1}];
+
+const LETTERS = ["A","B","C","D","E"];
+let answered = new Array(DATA.length).fill(null); // stores chosen option index or null
+
+const quizEl = document.getElementById('quiz');
+const thermFill = document.getElementById('thermFill');
+const thermLabel = document.getElementById('thermLabel');
+const scoreStrip = document.getElementById('scoreStrip');
+const finalPanel = document.getElementById('finalPanel');
+const finalScore = document.getElementById('finalScore');
+const finalNote = document.getElementById('finalNote');
+
+function render(){
+  quizEl.innerHTML = '';
+  DATA.forEach((item, qi) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'card-' + qi;
+
+    const numRow = document.createElement('div');
+    numRow.className = 'qnum';
+    numRow.innerHTML = `<span>Q${qi+1}</span><span class="tag">Original No. ${item.num}</span>`;
+    card.appendChild(numRow);
+
+    const qtext = document.createElement('p');
+    qtext.className = 'qtext';
+    qtext.textContent = item.q;
+    card.appendChild(qtext);
+
+    const ul = document.createElement('ul');
+    ul.className = 'options';
+
+    item.options.forEach((optText, oi) => {
+      const li = document.createElement('li');
+      li.className = 'opt';
+      li.dataset.index = oi;
+      li.innerHTML = `<span class="letter">${LETTERS[oi]}</span><span>${optText}</span>`;
+      li.addEventListener('click', () => selectAnswer(qi, oi));
+      ul.appendChild(li);
+    });
+
+    card.appendChild(ul);
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback';
+    fb.id = 'fb-' + qi;
+    card.appendChild(fb);
+
+    quizEl.appendChild(card);
+  });
+  updateProgress();
+}
+
+function selectAnswer(qi, oi){
+  if(answered[qi] !== null) return; // locked
+  answered[qi] = oi;
+
+  const card = document.getElementById('card-' + qi);
+  const opts = card.querySelectorAll('.opt');
+  const correctIdx = DATA[qi].correct;
+  const isCorrect = oi === correctIdx;
+
+  card.classList.add('answered', 'locked', isCorrect ? 'correct' : 'wrong');
+
+  opts.forEach((el, idx) => {
+    if(idx === oi && idx === correctIdx){
+      el.classList.add('chosen-correct');
+    } else if(idx === oi && idx !== correctIdx){
+      el.classList.add('chosen-wrong');
+    } else if(idx === correctIdx){
+      el.classList.add('reveal-correct');
+    } else {
+      el.classList.add('dim');
+    }
+  });
+
+  const fb = document.getElementById('fb-' + qi);
+  if(isCorrect){
+    fb.innerHTML = `<span class="verdict good">Correct.</span> ${LETTERS[correctIdx]} — ${DATA[qi].options[correctIdx]}`;
+  } else {
+    fb.innerHTML = `<span class="verdict bad">Not quite.</span> Correct answer: ${LETTERS[correctIdx]} — ${DATA[qi].options[correctIdx]}`;
+  }
+
+  updateProgress();
+}
+
+function updateProgress(){
+  const total = DATA.length;
+  const done = answered.filter(a => a !== null).length;
+  const correct = answered.filter((a, i) => a === DATA[i].correct).length;
+
+  const pct = (done / total) * 100;
+  thermFill.style.width = pct + '%';
+  thermLabel.textContent = `${done} / ${total}`;
+
+  if(done > 0){
+    scoreStrip.classList.add('show');
+    scoreStrip.innerHTML = `Score so far: <b>${correct} / ${done}</b> correct (${Math.round(correct/done*100)}%)`;
+  } else {
+    scoreStrip.classList.remove('show');
+  }
+
+  if(done === total){
+    finalPanel.classList.add('show');
+    finalScore.textContent = `${correct} / ${total}`;
+    const pctFinal = Math.round(correct/total*100);
+    let note = 'recalibrate and try again';
+    if(pctFinal >= 90) note = 'thermal equilibrium reached — excellent';
+    else if(pctFinal >= 70) note = 'solid — a few concepts to revisit';
+    else if(pctFinal >= 50) note = 'halfway to steady state — keep reviewing';
+    else note = 'back to the gas laws before the next attempt';
+    finalNote.textContent = note;
+    finalPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+  } else {
+    finalPanel.classList.remove('show');
+  }
+}
+
+function shuffleArr(arr){
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function reshuffleData(){
+  DATA.forEach(item => {
+    const correctText = item.options[item.correct];
+    shuffleArr(item.options);
+    item.correct = item.options.indexOf(correctText);
+  });
+}
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  answered = new Array(DATA.length).fill(null);
+  reshuffleData();
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+render();
+</script>
+</body>
+</html>
