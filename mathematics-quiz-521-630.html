@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mathematics Tests · Quiz 521–630</title>
+  <style>
+    :root {
+      --bg: #09111f;
+      --panel: rgba(19, 31, 52, .86);
+      --panel-2: #16233a;
+      --line: #2a3b59;
+      --text: #eef5ff;
+      --muted: #9eb0c9;
+      --accent: #73e0c2;
+      --accent-2: #8aa7ff;
+      --good: #5ee09a;
+      --bad: #ff8f9c;
+      --shadow: 0 22px 60px rgba(0, 0, 0, .28);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(115,224,194,.12), transparent 31rem),
+        radial-gradient(circle at 100% 8%, rgba(138,167,255,.14), transparent 28rem),
+        var(--bg);
+      font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button { font: inherit; }
+    .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 38px 0 58px; }
+    header { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 22px; }
+    .eyebrow { color: var(--accent); font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 5px 0 0; font-size: clamp(1.65rem, 4vw, 2.65rem); line-height: 1.1; letter-spacing: -.04em; }
+    .subtitle { color: var(--muted); margin: 10px 0 0; }
+    .score-pill { border: 1px solid var(--line); background: rgba(22,35,58,.75); border-radius: 999px; padding: 10px 15px; white-space: nowrap; color: var(--muted); }
+    .score-pill strong { color: var(--text); }
+    .progress-wrap { margin: 24px 0; }
+    .progress-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: .9rem; margin-bottom: 8px; }
+    .progress { height: 8px; border-radius: 99px; background: #1b2a43; overflow: hidden; }
+    .progress > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .25s ease; }
+    .layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 18px; align-items: start; }
+    .panel { border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); border-radius: 18px; }
+    .navigator { padding: 16px; position: sticky; top: 18px; }
+    .navigator-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .navigator h2 { font-size: .9rem; margin: 0; color: var(--muted); }
+    .toggle-nav { border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; color: var(--muted); background: #111d31; cursor: pointer; font-size: .75rem; }
+    .toggle-nav:hover { border-color: var(--accent-2); color: var(--text); }
+    .navigator.collapsed .jump-grid { display: none; }
+    .navigator.collapsed .utility { margin-top: 0; }
+    .jump-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: 470px; overflow: auto; padding-right: 3px; }
+    .jump {
+      border: 1px solid var(--line); color: var(--muted); background: #111d31; border-radius: 8px; padding: 6px 2px; cursor: pointer; font-size: .76rem;
+    }
+    .jump:hover { border-color: var(--accent-2); color: var(--text); }
+    .jump.current { color: #07131d; background: var(--accent); border-color: var(--accent); font-weight: 800; }
+    .jump.done { border-color: var(--good); color: var(--good); }
+    .jump.done.current { color: #07131d; }
+    .question-panel { padding: clamp(20px, 4vw, 42px); min-height: 620px; display: flex; flex-direction: column; }
+    .question-top { display: flex; justify-content: space-between; gap: 15px; align-items: center; color: var(--muted); font-size: .9rem; }
+    .tag { border: 1px solid #375172; border-radius: 999px; padding: 4px 9px; color: var(--accent-2); }
+    .stem { margin: 25px 0 23px; font-size: clamp(1.08rem, 2vw, 1.3rem); line-height: 1.65; white-space: pre-line; }
+    .stem code, .explanation code { color: #dbe6ff; background: #0d182a; border: 1px solid #253958; padding: 2px 6px; border-radius: 6px; font-size: .93em; }
+    .choices { display: grid; gap: 10px; }
+    .choice {
+      display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 14px 15px; text-align: left;
+      border: 1px solid var(--line); border-radius: 12px; color: var(--text); background: rgba(11, 23, 41, .8); cursor: pointer; transition: .18s ease;
+    }
+    .choice:hover { border-color: var(--accent-2); transform: translateY(-1px); }
+    .choice.selected { border-color: var(--accent-2); background: rgba(70, 98, 170, .25); }
+    .choice.correct { border-color: var(--good); background: rgba(41, 131, 85, .18); }
+    .choice.incorrect { border-color: var(--bad); background: rgba(160, 54, 76, .15); }
+    .letter { flex: 0 0 29px; height: 29px; display: grid; place-items: center; border-radius: 8px; background: #213653; color: #c8d6ec; font-weight: 800; font-size: .88rem; }
+    .selected .letter { background: var(--accent-2); color: #0b1423; }
+    .correct .letter { background: var(--good); color: #062016; }
+    .incorrect .letter { background: var(--bad); color: #2a0b11; }
+    .choice-text { padding-top: 2px; }
+    .feedback { min-height: 29px; margin-top: 15px; font-weight: 700; }
+    .feedback.good { color: var(--good); }
+    .feedback.bad { color: var(--bad); }
+    .explanation { border-left: 3px solid var(--accent); background: rgba(115,224,194,.07); padding: 13px 16px; border-radius: 0 10px 10px 0; color: #d9e7f7; }
+    .explanation strong { color: var(--accent); }
+    .hidden { display: none; }
+    .actions { display: flex; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 30px; }
+    .btn { border: 1px solid var(--line); border-radius: 10px; padding: 11px 17px; color: var(--text); background: #172740; cursor: pointer; font-weight: 750; }
+    .btn:hover:not(:disabled) { border-color: var(--accent-2); }
+    .btn.primary { color: #07131d; background: var(--accent); border-color: var(--accent); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .utility { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 20px; }
+    .utility .btn { font-size: .88rem; padding: 8px 12px; }
+    .source-note { color: var(--muted); font-size: .84rem; margin-top: 22px; }
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 20px, 650px); padding-top: 24px; }
+      header { display: block; }
+      .score-pill { display: inline-block; margin-top: 17px; }
+      .layout { display: block; }
+      .navigator { position: static; margin-bottom: 14px; }
+      .jump-grid { max-height: 120px; grid-template-columns: repeat(10, 1fr); }
+      .question-panel { min-height: 650px; padding: 21px 17px; }
+      .actions { position: sticky; bottom: 0; background: linear-gradient(transparent, var(--panel) 24%); padding-top: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <div class="eyebrow">Mathematics tests</div>
+        <h1>Questions 521–630</h1>
+        <p class="subtitle">110 questions · one question per screen · instant solutions</p>
+      </div>
+      <div class="score-pill">Score: <strong id="score">0 / 0</strong></div>
+    </header>
+
+    <div class="progress-wrap">
+      <div class="progress-meta"><span id="progressLabel">Question 1 of 110</span><span id="answeredLabel">0 answered</span></div>
+      <div class="progress"><i id="progressBar"></i></div>
+    </div>
+
+    <div class="layout">
+      <aside class="navigator panel">
+        <div class="navigator-heading">
+          <h2>Jump to question</h2>
+          <button class="toggle-nav" id="toggleNavBtn" type="button" aria-expanded="true">Hide</button>
+        </div>
+        <div class="jump-grid" id="jumpGrid"></div>
+        <div class="utility">
+          <button class="btn" id="resetBtn" type="button">Reset quiz</button>
+        </div>
+      </aside>
+
+      <section class="question-panel panel" aria-live="polite">
+        <div class="question-top">
+          <span id="questionNumber">Question 521</span>
+          <span class="tag">Multiple choice</span>
+        </div>
+        <div class="stem" id="stem"></div>
+        <div class="choices" id="choices"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="explanation hidden" id="explanation"></div>
+        <div class="actions">
+          <button class="btn" id="prevBtn" type="button">← Previous</button>
+          <button class="btn" id="solutionBtn" type="button">Show solution</button>
+          <button class="btn primary" id="nextBtn" type="button">Next →</button>
+        </div>
+        <div class="source-note">Solutions are worked from the supplied text. A few source items contain an apparent typo or missing answer choice; those are called out in the solution.</div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const Q = (number, stem, options, answer, explanation) => ({ number, stem, options, answer, explanation });
+    const questions = [
+      Q(521, `Which of the following is a simplification of:
+<code>(2x² − 9x − 18)/(x² − 6x) − (3x² + 8x − 3)/(x² + 3x)</code>`, ["4/x − 1", "2/x − 1", "2 − 1/x", "4/x − 2", "4 − x"], 0, `Factor the numerators and denominators: the expression becomes <code>(2x + 3)/x − (3x − 1)/x = 4/x − 1</code> (with the original denominator restrictions).`),
+      Q(522, `Find the set of real solutions of this inequation:
+<code>2x² − 6x + 5 &gt; 0</code>`, ["∅", "R", "(−∞, 1) ∪ (2, +∞)", "(1, 2)", "{1, 2}"], 1, `The discriminant is <code>(−6)² − 4(2)(5) = −4</code>, so the upward-opening quadratic never crosses the x-axis and is always positive. The solution is <code>R</code>.`),
+      Q(523, `The ratio of sugar to flour in a mixture is 1:5. After 1 kg of sugar and 2 kg of flour are added, the ratio changes to 2:5. A further 1 kg of sugar and 2 kg of flour are added. What is the new ratio?`, ["3:5", "3:7", "4:7", "11:25", "14:25", "11:16 (the computed result; omitted from the supplied choices)"], 5, `Let the original amounts be <code>s</code> and <code>5s</code>. From <code>(s+1)/(5s+2)=2/5</code>, <code>s=1/5</code>. After the second additions the amounts are <code>11/5</code> and <code>16/5</code>, giving <code>11:16</code>. This result is not among the five choices in the supplied text.`),
+      Q(524, `Evaluate:
+<code>∛[((9 × 10⁴)² − 10⁸ + 1.2 × 10¹¹)/(10⁻¹ − 9.8 × 10⁻²)]</code>`, ["400", "8000", "10000", "40000", "100000"], 3, `The numerator is <code>1.28 × 10¹¹</code> and the denominator is <code>0.002</code>, so the value inside the cube root is <code>6.4 × 10¹³ = 40,000³</code>.`),
+      Q(525, `Find the area enclosed by the three lines:
+<code>y = 0,   y = 2x − 4,   y = 11 − x</code>`, ["3", "22 1/2", "27", "37 1/2", "39"], 2, `The vertices are <code>(2,0)</code>, <code>(11,0)</code>, and <code>(5,6)</code>. Thus the triangle has base 9 and height 6, so its area is <code>½ × 9 × 6 = 27</code>.`),
+      Q(526, `<code>8^(2x+3) × 1/4^(3x) = 2^(x+3)</code>. What is the value of x?`, ["0", "1/2", "3/2", "3", "6"], 4, `Rewrite everything in base 2: <code>2^(6x+9−6x)=2^(x+3)</code>. Hence <code>9=x+3</code>, so <code>x=6</code>.`),
+      Q(527, `Two standard six-sided dice are rolled. What is the probability that the product is the square of a prime?`, ["3/36", "4/36", "5/36", "6/36", "7/36"], 1, `The possible products are 4 and 25 from <code>(1,4),(4,1),(5,5)</code>, plus 9 from <code>(3,3)</code>: 4 outcomes out of 36, or <code>4/36</code>.`),
+      Q(528, `For which x do both inequalities hold?
+<code>100 − 99x ≤ 98 − 97x</code> and <code>96 + 95x &gt; 94 + 93x</code>`, ["x &gt; −1", "x ≤ −1 or x &gt; 1", "−1 &lt; x ≤ 1", "x &gt; 1", "x ≥ 1"], 4, `The first inequality gives <code>x ≥ 1</code>; the second gives <code>x &gt; −1</code>. Their intersection is <code>x ≥ 1</code>.`),
+      Q(529, `What is the minimum distance of the circle
+<code>x² − 10x + y² + 12y + 57 = 0</code>
+from the coordinate axes?`, ["1", "2", "3", "4", "5"], 2, `Completing the square gives <code>(x−5)² + (y+6)² = 4</code>, so the centre is <code>(5,−6)</code> and the radius is 2. The distances to the y- and x-axes are 5−2=3 and 6−2=4; the minimum is 3.`),
+      Q(530, `Two concentric circles have centre O. The larger radius is 50% greater than the smaller radius. The smaller circle has area <code>36π cm²</code>. The shaded sector is in the larger circle and has area <code>27π/8 cm²</code>. What is θ?`, ["8 7/16°", "15°", "16 7/8°", "22 1/2°", "30°"], 1, `The smaller radius is 6 cm, so the larger radius is 9 cm and its area is <code>81π</code>. Using <code>(θ/360)·81π = 27π/8</code> gives <code>θ=15°</code>.`),
+      Q(531, `For <code>x &gt; 1</code>, <code>f(x)=2ln(x)−2ln(x−1)</code>. Which is an expression for its inverse function?`, ["e^(y/2)/(e^(y/2)−1), y &gt; 0", "e^(y/2)/(e^(y/2)−1), y &gt; 1", "1/(e^(y/2)−1), y &gt; 0", "1/(e^(y/2)−1), y &gt; 1", "1/(e^(y/2)−1), y ≠ 0"], 0, `Set <code>t=e^(y/2)=x/(x−1)</code>. Solving gives <code>x=t/(t−1)</code>. Since x&gt;1, t&gt;1 and therefore y&gt;0.`),
+      Q(532, `Find the complete set of x satisfying:
+<code>½(2x+3) − ⅔(x+1) &lt; 2x</code>`, ["x &gt; −5", "x &gt; 1/2", "x &gt; 5/14", "x &gt; 7/8", "x &gt; 5/4"], 1, `The left side simplifies to <code>x/3 + 5/6</code>. Thus <code>x/3 + 5/6 &lt; 2x</code>, which gives <code>x &gt; 1/2</code>.`),
+      Q(533, `PQR is right-angled at R. S lies on PR with RS=2.5 cm and PS=1 cm; T lies on RQ with RT=5 cm; ST is parallel to PQ. What is the perimeter of trapezium PQTS?`, ["2(1 + 3√3)", "2(1 + 3√5)", "2(1 + 3√6)", "3(1 + 2√3)", "3(1 + 2√5)"], 4, `Since <code>PR=3.5</code>, similarity gives <code>RS/PR=5/7</code>, so <code>RQ=7</code>. The small hypotenuse is <code>ST=√(2.5²+5²)=5√5/2</code>, hence <code>PQ=7√5/2</code>. Adding <code>PQ+QT+TS+SP</code> gives <code>6√5+3=3(1+2√5)</code>.`),
+      Q(534, `Which expression equals <code>(8^(2n) × 4^n)/2^n</code> for all integers n?`, ["2^(6n)", "2^(6n+1)", "2^(2n+5)", "2^(7n)", "2^(14n)"], 3, `Convert to base 2: <code>2^(6n)·2^(2n) / 2^n = 2^(7n)</code>.`),
+      Q(535, `Simplify:
+<code>(x+2)²/(x²+x−2)</code>`, ["(x+2)²/((x−2)(x+1))", "(4x+4)/(x−2)", "(x+2)/(x−2)", "(x+2)/(x−1)", "−4"], 3, `Factor the denominator: <code>x²+x−2=(x+2)(x−1)</code>. Cancelling <code>x+2</code> leaves <code>(x+2)/(x−1)</code>.`),
+      Q(536, `What are the coordinates of the turning point of <code>y=2x²+5x−2</code>?`, ["(−5/4, −41/8)", "(−5/2, −41/16)", "(5/4, −41/16)", "(−5/2, −41/8)", "(−5/4, −41/16)"], 0, `The vertex x-coordinate is <code>−b/(2a)=−5/4</code>. Substitution gives <code>y=−41/8</code>.`),
+      Q(537, `If <code>x=0.02</code> and <code>n=10,000</code>, calculate:
+<code>√[x(0.1−x)/n]</code>`, ["0.4", "0.04", "0.004", "0.0004", "0.00004"], 3, `The radicand is <code>0.02×0.08/10000 = 1.6×10⁻⁷</code>; its square root is <code>0.0004</code>.`),
+      Q(538, `What is the median of <code>0.5, 3/8, 0.75, 17/24, 0.25</code>?`, ["0.5", "3/8", "0.75", "17/24", "0.25"], 0, `In increasing order the values are <code>0.25, 0.375, 0.5, 0.708..., 0.75</code>. The middle value is 0.5.`),
+      Q(539, `Which is equal to <code>2/(2+√3)</code>?`, ["4−2√3", "4+2√3", "4/7−2√3/7", "4/7+2√3/7", "1−√3/2"], 0, `Rationalize the denominator: <code>2(2−√3)/(4−3)=4−2√3</code>.`),
+      Q(540, `PQR and PRS are right-angled triangles. RS=5 cm, area of PQR is 14 cm², and tan(PRQ)=1/7. What is cos(RPS)?`, ["1/3", "√2/2", "√2/4", "√6/3", "2√2/3"], 4, `Let <code>RQ=7k</code> and <code>PQ=k</code>. The area gives <code>7k²/2=14</code>, so k=2 and <code>PR=10√2</code>. Then <code>PS=√(200+25)=15</code>, so <code>cos(RPS)=PR/PS=2√2/3</code>.`),
+      Q(541, `Two angles of a triangle measure 15° and 85°. What is the third angle?`, ["50°", "55°", "60°", "80°", "90°"], 3, `Triangle angles total 180°, so the third angle is <code>180−15−85=80°</code>.`),
+      Q(542, `39 male and 36 female students have mean meal counts 2 and x respectively. The overall mean is 3 1/5. What is x?`, ["2 3/5", "3 4/5", "4 1/2", "4 2/5", "4 2/3"], 2, `The total is <code>75×3.2=240</code>. Male meals account for 78, so female meals total 162; <code>x=162/36=4.5=4 1/2</code>.`),
+      Q(543, `Three babies have mean mass 2.1 kg and range 0.7 kg. The lightest is 1.8 kg. What is the median mass?`, ["1.95 kg", "2.0 kg", "2.1 kg", "2.15 kg", "2.3 kg"], 1, `The heaviest is <code>1.8+0.7=2.5</code> kg. The total mass is 6.3 kg, so the median is <code>6.3−1.8−2.5=2.0</code> kg.`),
+      Q(544, `What is the highest common factor of 360, 500 and 700, written as a product of prime powers?`, ["2 × 5", "2² × 5", "2³ × 5³", "2² × 3² × 5 × 7", "2³ × 3² × 5³ × 7"], 1, `The minimum powers shared by all three numbers are <code>2²</code> and <code>5</code>, giving <code>2²×5=20</code>.`),
+      Q(545, `If the mean of X, Y and Z is 50, what is the mean of <code>3X−10, 3Y+20, 3Z+50</code>?`, ["70", "120", "130", "150", "170"], 4, `X+Y+Z=150. The transformed sum is <code>3(150)−10+20+50=510</code>; dividing by 3 gives 170.`),
+      Q(546, `What is the sum of the solutions of <code>3/x + 2/(x−2) = 1</code>?`, ["−7", "−3", "2.4", "5", "7"], 4, `Multiplying by x(x−2) gives <code>x²−7x+6=0</code>. The two roots are 1 and 6, whose sum is 7.`),
+      Q(547, `Exactly 2/5 of a group are male and exactly 1/3 study mathematics. If p is the probability that a randomly chosen male studies mathematics, what is the possible range of p?`, ["0 ≤ p ≤ 1/3", "0 ≤ p ≤ 5/6", "1/3 ≤ p ≤ 2/5", "1/3 ≤ p ≤ 1", "2/5 ≤ p ≤ 5/6"], 1, `The overlap of the male and mathematics groups can range from 0 to the full mathematics group, 1/3. Divide by the male proportion 2/5: <code>0 ≤ p ≤ (1/3)/(2/5)=5/6</code>.`),
+      Q(548, `A regular pentagon is centred at the origin. R rotates A→B→C→D→E→A, and S reflects in the y-axis. Which sequence does NOT leave vertex D in its original position?`, ["RRSRSR", "RSRS", "SR", "RSRR", "SRRSRS"], 0, `Label the vertices 0–4. Starting at D=3, apply R as +1 and S as i→−i mod 5. RRSRSR ends at A, not D; the other sequences return to D.`),
+      Q(549, `The line L is <code>y=2x−1</code>. Four points are the same distance from L. Which is different?`, ["(1, 3)", "(4, 9)", "(6, 9)", "(5, 13)", "(1, −1)"], 3, `Use distance proportional to <code>|2x−y−1|</code>. The first, second, third and fifth points give 2; (5,13) gives 4.`),
+      Q(550, `Which is equivalent to <code>ln(x²y) − 2ln(xy) − 3ln y</code>?`, ["0", "2ln y", "ln x + 2ln y", "ln x + ln y", "2ln x + 2ln y", "−4ln y (the result from the supplied expression)"], 5, `Using log laws gives <code>(2ln x+ln y)−2(ln x+ln y)−3ln y=−4ln y</code>. That result is absent from the five supplied choices, so the source item appears to contain a sign or option typo.`),
+      Q(551, `What is the mean of 8 numbers if the mean of 5 is 24 and the sum of the remaining 3 is 40?`, ["8", "16", "20", "30", "32"], 2, `The total is <code>5×24+40=160</code>. Therefore the mean of all 8 numbers is <code>160/8=20</code>.`),
+      Q(552, `Find the set of x for which <code>x²&lt;9</code> and <code>2x+3≥5</code>.`, ["x &gt; 3", "x &gt; −3", "x ≥ −1", "1 ≤ x &lt; 3", "x &lt; −3 or x ≥ 1"], 3, `<code>x²&lt;9</code> gives −3&lt;x&lt;3, while the second inequality gives x≥1. The intersection is <code>1≤x&lt;3</code>.`),
+      Q(553, `Two sides of a triangle are 5 inches and 8 inches. Which could be the third side?`, ["2 inches", "3 inches", "6 inches", "13 inches", "17 inches"], 2, `The triangle inequality requires <code>3 &lt; third side &lt; 13</code>. Of the choices, only 6 satisfies it.`),
+      Q(554, `A right triangle has area 18 cm². One shorter side is twice the other. What is the hypotenuse?`, ["3√5 cm", "3√6 cm", "3√10 cm", "9√2 cm", "6√5 cm"], 2, `Let the legs be a and 2a. Then <code>a²=18</code>, so the hypotenuse is <code>√(a²+4a²)=√90=3√10</code> cm.`),
+      Q(555, `If <code>x=3×10^m</code> and <code>y=5×10^n</code>, which is xy in scientific notation?`, ["15×10^(m+n−1)", "1.5×10^(m+n+1)", "1.5×10^(mn+1)", "8×10^(m+n)", "1.5×10^(mn)"], 1, `<code>xy=15×10^(m+n)=1.5×10^(m+n+1)</code>.`),
+      Q(556, `Simplify <code>2/(x²−1) − 1/(x−1)</code>, where x≠±1.`, ["(3−x)/((x−1)(x+1))", "1/(x²+1)", "(3−x)/(x−1)²", "−1/(x+1)", "2/(x−1)"], 3, `With the common denominator <code>(x−1)(x+1)</code>, the numerator is <code>2−(x+1)=1−x</code>. Cancelling gives <code>−1/(x+1)</code>.`),
+      Q(557, `The line <code>x/4+y/6=1</code> meets the axes at A and B. A circle has diameter AB. What are its centre coordinates?`, ["(0,0)", "(2,3)", "(3,2)", "(4,6)", "(6,4)"], 1, `The intercepts are A=(4,0) and B=(0,6). The midpoint, and therefore the circle centre, is <code>((4+0)/2,(0+6)/2)=(2,3)</code>.`),
+      Q(558, `A 3° arc has length 2 inches. What is the circumference of the circle?`, ["100 inches", "120 inches", "200 inches", "240 inches", "360 inches"], 3, `A 3° arc is 1/120 of the circumference, so the circumference is <code>2×120=240</code> inches.`),
+      Q(559, `A sequence starts with 1; each next number is 1 plus the reciprocal of the preceding number. What is the third term?`, ["0.5", "1", "1.5", "2", "2.5"], 2, `The terms begin <code>1, 1+1/1=2, 1+1/2=1.5</code>.`),
+      Q(560, `A fair coin is tossed six times. What is the probability of exactly three heads?`, ["9/16", "1/2", "7/16", "5/16", "3/16"], 3, `There are <code>C(6,3)=20</code> favourable sequences out of 64, so the probability is <code>20/64=5/16</code>.`),
+      Q(561, `If x is an odd integer, which expression is also an odd integer?`, ["2x+6", "x²+x+3", "x²+2x+1", "4x", "x²+5"], 1, `For odd x, x² and x have the same odd parity, so x²+x is even; adding 3 makes the result odd.`),
+      Q(562, `What is <code>6.334×10⁴</code>?`, ["0.0006334", "0.06334", "6,334", "63,340", "633,400"], 3, `Moving the decimal point four places right gives 63,340.`),
+      Q(563, `When Y is multiplied by 4/7, the result is 6/7. What is Y?`, ["2/7", "2/3", "3/2", "7/2", "24/7"], 2, `Divide by 4/7: <code>Y=(6/7)×(7/4)=6/4=3/2</code>.`),
+      Q(564, `Four students sit in a row of four seats. How many different arrangements are possible?`, ["12", "16", "18", "24", "26"], 3, `The number of permutations is <code>4!=4×3×2×1=24</code>.`),
+      Q(565, `Solve <code>x+3y=13</code> and <code>2x−y=5</code>. What is x+y?`, ["6", "7", "8", "9", "10"], 1, `From the second equation y=2x−5. Substitution gives x=4 and y=3, so x+y=7.`),
+      Q(566, `Two fair coins are tossed and a fair die is rolled. What is the probability of two heads and a number less than 5?`, ["1/12", "1/6", "5/24", "1/3", "2/3"], 1, `P(two heads)=1/4 and P(die&lt;5)=4/6=2/3. Independence gives <code>1/4×2/3=1/6</code>.`),
+      Q(567, `If x and y are integers and <code>4x+5y=19</code>, which could be x?`, ["1", "2", "3", "4", "5"], 0, `Modulo 5, <code>4x≡19≡4</code>, so x≡1 (mod 5). The listed possible value is 1; then y=3.`),
+      Q(568, `If the sum of n consecutive integers is 0, which must be true?
+I) n is even  II) n is odd  III) the arithmetic mean is 0`, ["I only", "II only", "III only", "I and III", "II and III"], 4, `The arithmetic mean is the sum divided by n, so III is true. A zero sum of consecutive integers requires an odd count centred at zero, so II is also true.`),
+      Q(569, `Blue, green and red marbles are in ratio 5:7:8. If there are 240 total, how many are green?`, ["81", "83", "84", "86", "90"], 2, `The ratio has 20 parts, so each part is 12. Green marbles: <code>7×12=84</code>.`),
+      Q(570, `If <code>x=mx+n</code> and <code>y=mx−n</code>, what is y−x?`, ["x−y", "−2n", "m+n", "2m", "−m"], 1, `Subtract directly: <code>y−x=(mx−n)−(mx+n)=−2n</code>.`),
+      Q(571, `Products sold over four days were x, x+5, x+3 and x+12. The daily average was 13. Find x.`, ["4", "6", "7", "8", "12"], 3, `The total is 52: <code>4x+20=52</code>. Hence x=8.`),
+      Q(572, `Points (1,2) and (x,5) lie on a line of slope 3. What is x?`, ["1", "2", "4", "5", "7"], 1, `The slope equation is <code>(5−2)/(x−1)=3</code>, so x−1=1 and x=2.`),
+      Q(573, `75% answered the first question correctly, 55% answered the second correctly, and 20% answered neither. What percent answered both?`, ["10%", "20%", "30%", "50%", "65%"], 3, `The union is 80%. Inclusion–exclusion gives both = <code>75+55−80=50%</code>.`),
+      Q(574, `Which equals <code>3/(√5+√2)</code>?`, ["(√5+√2)/2", "√5+√2", "√5−√2", "3√5+3√2", "3√5−3√2"], 2, `Multiply by the conjugate: <code>3(√5−√2)/(5−2)=√5−√2</code>.`),
+      Q(575, `Which is equal to <code>5.93×10⁻²</code>?`, ["0.0593", "0.00593", "593", "5930", "59300"], 0, `A negative exponent moves the decimal two places left: <code>5.93×10⁻²=0.0593</code>.`),
+      Q(576, `For real x, solve <code>10x−3x²&lt;7</code>.`, ["x &gt; 10/3", "−7/3 &lt; x &lt; −1", "1 &lt; x &lt; 7/3", "x &lt; −7/3 or x &gt; −1", "x &lt; 1 or x &gt; 7/3"], 4, `Rearrange to <code>3x²−10x+7&gt;0</code>. Its roots are 1 and 7/3; an upward quadratic is positive outside the roots.`),
+      Q(577, `If m is the mean and M is the median of the first 10 positive multiples of 5, what is M−m?`, ["0", "5", "10", "15", "25"], 0, `The list is 5,10,...,50. Both mean and median are 27.5, so their difference is 0.`),
+      Q(578, `a, b and c are consecutive integers with a&lt;b&lt;c and a+b+c=96. Find b.`, ["30", "31", "32", "33", "34"], 2, `The middle integer is the average: <code>b=96/3=32</code>.`),
+      Q(579, `Given <code>2log₁₀(x)−3=log₁₀(y)</code>, express y in terms of x.`, ["y=2x/1000", "y=2x/3", "y=x²/3", "y=x²/1000", "y=x²−3"], 3, `Since <code>2log x=log(x²)</code> and 3=log(1000), the right side is <code>log(x²/1000)</code>.`),
+      Q(580, `Two positive integers have sum 24 and difference of their squares 48. What is their product?`, ["108", "119", "128", "135", "143"], 4, `If the larger is b, <code>(b−a)(b+a)=48</code>. Since b+a=24, b−a=2, giving 11 and 13; product=143.`),
+      Q(581, `P=(2,8). The midpoint M of PQ is on the y-axis and Q is on the x-axis. Find M and Q.`, ["M(0,0), Q(−8,0)", "M(0,3), Q(−4,0)", "M(0,4), Q(−2,0)", "M(0,6), Q(−5,0)", "M(1,4), Q(0,0)"], 2, `Let Q=(q,0). The midpoint x-coordinate is (2+q)/2=0, so q=−2. Its y-coordinate is 4: M=(0,4).`),
+      Q(582, `The average height of 3 players is 175 cm. What must the average height of the other 2 be if the five-player average is 178 cm?`, ["178 cm", "181 cm", "182.5 cm", "183.5 cm", "184 cm"], 2, `The first three total 525 cm and all five total 890 cm. The other two total 365, so their average is <code>365/2=182.5</code> cm.`),
+      Q(583, `Find x if <code>12−x²&gt;8</code> and <code>3−2x≥5</code>.`, ["1 ≤ x &lt; 2", "−2 &lt; x ≤ −1", "−2 &lt; x ≤ 1", "2 &lt; x", "x ≤ −1"], 1, `The first inequality gives −2&lt;x&lt;2. The second gives x≤−1. Together: <code>−2&lt;x≤−1</code>.`),
+      Q(584, `95% of revenue came from computers. The remaining revenue from DVDs was £450,000. What was total revenue?`, ["£1,500,000", "£2,500,000", "£4,500,000", "£9,000,000", "£10,000,000"], 3, `The DVD revenue is 5% of the total, so total = <code>£450,000 / 0.05 = £9,000,000</code>.`),
+      Q(585, `What is the mean of 8, 12, 13, 14, 15 and 16?`, ["11", "12", "13", "14", "15"], 2, `Their sum is 78, and <code>78/6=13</code>.`),
+      Q(586, `What fraction is equal to 0.15%?`, ["3/2000", "2/750", "7/4000", "5/3462", "1/500"], 0, `<code>0.15%=0.0015=15/10000=3/2000</code>.`),
+      Q(587, `In right-angled triangle ABC, AB=20 cm and tan A=1/2. AC is the hypotenuse. What is the perpendicular from the hypotenuse to B?`, ["8√5 cm", "10√2 cm", "2√5 cm", "5√2 cm", "4√5 cm"], 4, `Since <code>tan A=BC/AB</code>, BC=10. Then AC=10√5. The altitude to the hypotenuse is <code>AB·BC/AC=20×10/(10√5)=4√5</code> cm.`),
+      Q(588, `x and y are inversely proportional. If x=10 and y=5, what is y when x=25?`, ["1", "2", "5", "10", "20"], 1, `The constant product is <code>xy=50</code>. When x=25, <code>y=50/25=2</code>.`),
+      Q(589, `What is the median of <code>17/36, 1/2, 2/8, 13/18, 9/27</code>?`, ["17/36", "1/2", "2/8", "13/18", "9/27"], 0, `The values in order are <code>1/4, 1/3, 17/36, 1/2, 13/18</code>. The middle value is 17/36.`),
+      Q(590, `Which interval contains <code>7/8+1/10</code>?`, ["Between 1/2 and 3/4", "Between 3/4 and 9/10", "Between 9/10 and 1", "Between 1 and 11/10", "Between 11/10 and 1.5"], 2, `<code>7/8+1/10=35/40+4/40=39/40=0.975</code>, which lies between 0.9 and 1.`),
+      Q(591, `Supply is <code>S=3X²+X−10</code>; demand is <code>D=2X²+4X</code>. At which positive X are they equal?`, ["2", "3", "4", "5", "6"], 3, `Set S=D: <code>X²−3X−10=0=(X−5)(X+2)</code>. The positive solution is X=5.`),
+      Q(592, `A square ABCD and triangular region ACE each have area 36. What is the perimeter of triangle ACD?`, ["12", "12+6√2", "18", "18+√72", "24"], 1, `The square side is 6. Triangle ACD has sides 6, 6 and diagonal AC=6√2, so its perimeter is <code>12+6√2</code>.`),
+      Q(593, `An apple costs X/2 and a pear costs Y/3. What is the average cost for A apples and B pears?`, ["(3A+2B)/12", "(3AX+2BY)/2", "(3AX+2BY)/6", "(3AX+2BY)/(A+B)", "(3AX+2BY)/(6(A+B))"], 4, `Total cost is <code>AX/2+BY/3=(3AX+2BY)/6</code>. Divide by the total number of units A+B.`),
+      Q(594, `Two angles in a triangle equal 120°. What is the measure of the third angle?`, ["60°", "70°", "80°", "90°", "120°", "No such triangle exists"], 5, `Two 120° angles already total 240°, exceeding the 180° angle sum of a triangle. Therefore the stated triangle is impossible; this is not represented in the supplied choices.`),
+      Q(595, `For which expression is the value the same at X=−456 as at X=456?
+1) 50−2X
+2) 50−2X²
+3) (50−2X³)²`, ["1", "2", "3", "2 and 3", "1, 2 and 3"], 1, `Expression 1 changes sign in its X-term. Expression 2 depends on X² and is unchanged. Expression 3 gives different values for ±456 after squaring, because <code>(50−2X³)² ≠ (50+2X³)²</code>.`),
+      Q(596, `The source prints <code>(X−3)(X−1)=0</code>, followed by statements involving Y. Assuming the intended equation is <code>(X−3)(Y−1)=0</code>, which must be true?
+I. X=3 and Y=1
+II. If X≠3 then Y=1
+III. If X=3 then Y≠1`, ["I only", "II only", "III only", "I, II and III", "None of the above"], 1, `For a product to be zero, either X=3 or Y=1. If X≠3, the second factor must be zero, so II is true. I and III do not follow. The printed equation appears to have a typo.`),
+      Q(597, `Salary = £2500 + X/10, where X is monthly book value. July salary was £4000; August salary was 20% greater. What was August book value?`, ["£2,900", "£2,980", "£10,000", "£15,000", "£23,000"], 4, `August salary is <code>£4000×1.2=£4800</code>. Therefore <code>X/10=4800−2500=2300</code>, so X=£23,000.`),
+      Q(598, `£5,000 earns 7% annual interest compounded quarterly. What is its value after 3 years?`, ["5,000×(1.0175)^12", "5,000×(1.07)^3", "5,000×(1.07)^21", "5,000×(1.07)^12", "5,000×(1.0233)^3"], 0, `Quarterly rate is <code>0.07/4=0.0175</code> and there are <code>3×4=12</code> quarters, giving <code>5000(1.0175)^12</code>.`),
+      Q(599, `ABDE is a square and BC=CD. Which statement is not true?`, ["AC=CE", "angle r = angle z", "angle x = angle y", "angle p = angle z", "The areas of triangles ABC and CDE are equal"], 3, `C is the midpoint of the square's top side. The two small right triangles are congruent and the large triangle ACE has a right-angle apex; the listed equality involving the apex angle p and base angle z is the one that is not true.`),
+      Q(600, `For <code>y=(x−5)³+2(x+2)²+(x−3)+7</code>, point P(7,176) is:`, ["on the curve", "less than 10 cm below the curve", "more than 10 cm below the curve", "less than 10 cm above the curve", "more than 10 cm above the curve"], 1, `At x=7, the curve has y-value <code>2³+2(9²)+4+7=181</code>. P has y=176, so it is 5 cm below the curve—less than 10 cm.`),
+      Q(601, `The supplied statement says: “The product of two positive integers A and B is four times the sum of A and B. If A=2, find B.”`, ["2", "4", "6", "8", "12", "No positive integer solution"], 5, `Substitution gives <code>2B=4(2+B)=8+4B</code>, hence B=−4, which is not positive. Therefore the statement as supplied has no positive integer solution and the five listed choices cannot be correct.`),
+      Q(602, `What is the composite function f·g(x) if <code>f(x)=2x−1</code> and <code>g(x)=6−x</code>?`, ["11−2x", "11−x", "13−2x", "7−2x", "5−2x"], 0, `<code>f(g(x))=2(6−x)−1=11−2x</code>.`),
+      Q(603, `What is the line through (4,1) parallel to <code>3x+2y=12</code>?`, ["3y=14−2x", "2y=11−3x", "2y=14−3x", "3y=2x−5", "2y=3x−10"], 2, `Parallel lines have the same left-hand coefficients. Substituting (4,1) into <code>3x+2y=c</code> gives c=14, so <code>2y=14−3x</code>.`),
+      Q(604, `Calculate <code>(8⁴−1)/(3(8²+1))</code>.`, ["11", "21", "25", "35", "43"], 1, `Use <code>8⁴−1=(8²−1)(8²+1)</code>. Cancelling <code>8²+1</code> leaves <code>(64−1)/3=21</code>.`),
+      Q(605, `Which sum is greatest?
+I. 1/√2+1/√3+1/√4+1/√5
+II. 1/2+1/3+1/4+1/5
+III. 1/2²+1/3²+1/4²+1/5²
+IV. 1/2²+1/2³+1/2⁴+1/2⁵
+V. 1/3²+1/3³+1/3⁴+1/3⁵`, ["I", "II", "III", "IV", "V"], 0, `The approximate sums are I≈2.23, II≈1.03, III≈0.46, IV≈0.47 and V≈0.16. Therefore I is greatest.`),
+      Q(606, `In the supplied trapezoid-and-rectangle diagram, the parallel sides are A and a and the height is h. What is the combined area of the two grey triangles?`, ["2Ah", "ah/2", "(A+a)/(2h)", "h(A−a)/2", "h(A+a)/2"], 3, `The trapezoid area is <code>h(A+a)/2</code>. Removing the central rectangle of area ah leaves <code>h(A−a)/2</code> for the two side triangles.`),
+      Q(607, `Calculate <code>√5−√125</code>.`, ["−√120", "−2√5", "−4√5", "−2.5", "−0.00004"], 2, `Since <code>√125=5√5</code>, the expression is <code>√5−5√5=−4√5</code>.`),
+      Q(608, `What is the area of a rectangle with length 3X+1 and width X−3?`, ["X²−8X−3", "2X²+8X−3", "3X²+8X−3", "3X²−8X−3", "3X²−8X+3"], 3, `Expand: <code>(3X+1)(X−3)=3X²−9X+X−3=3X²−8X−3</code>.`),
+      Q(609, `If 167²=27,889, what does 167×501 equal?`, ["167×4", "27,889×3", "27,889×4", "(27,889)²", "(27,889)³"], 1, `Because <code>501=3×167</code>, <code>167×501=3×167²=3×27,889</code>.`),
+      Q(610, `The sides of an equilateral triangle measure X. What is its area?`, ["X²/2", "√2 X²", "(√2/3)X²", "(√3/4)X²", "fourth-root(4/3) X²"], 3, `The standard equilateral-triangle area formula is <code>(√3/4)X²</code>.`),
+      Q(611, `If <code>y(x−1)=z</code>, then x equals:`, ["y−z", "1−zy", "y(z−1)", "z(y−1)", "z/y+1"], 4, `Divide by y: <code>x−1=z/y</code>, so <code>x=z/y+1</code>.`),
+      Q(612, `The mean of A and B is 60 and the mean of B and C is 80. What is C−A?`, ["10", "20", "30", "40", "50"], 3, `The equations are A+B=120 and B+C=160. Subtracting gives <code>C−A=40</code>.`),
+      Q(613, `What will it cost to tile a 12 ft by 20 ft kitchen floor at $8.91 per square yard?`, ["$224.51", "$237.60", "$246.55", "$271.38", "$282.32"], 1, `Area is 240 ft² = <code>240/9=26⅔</code> yd². Cost is <code>26⅔×8.91=$237.60</code>.`),
+      Q(614, `You are 120 ft from a 50-ft tree. Approximately how far is your head from the top in a straight line?`, ["75 feet", "120 feet", "130 feet", "145 feet", "170 feet"], 2, `Use the right triangle: <code>√(120²+50²)=√16900=130</code> feet.`),
+      Q(615, `If <code>3x=6x−15</code>, then x+8 equals:`, ["5", "10", "11", "12", "13"], 4, `The equation gives <code>3x=15</code>, so x=5 and x+8=13.`),
+      Q(616, `What is 1/9 of 9?`, ["1/9", "0", "1", "2", "3"], 2, `<code>(1/9)×9=1</code>.`),
+      Q(617, `The operation is <code>x@y=(x−y)/(2x−y)</code>. Which equals 0?`, ["−2@2", "2@−2", "2@2", "2@1", "3@2"], 2, `A fraction is zero when its numerator is zero. For <code>2@2</code>, x−y=0 and the denominator is 2, so the value is 0.`),
+      Q(618, `Which fraction is less than 2/3?`, ["7/8", "5/6", "3/4", "3/5", "5/7"], 3, `Compare the values: 7/8≈.875, 5/6≈.833, 3/4=.75, 3/5=.6 and 5/7≈.714. Only 3/5 is less than 2/3.`),
+      Q(619, `By how much does 0.756 exceed 3/4?`, ["6/25", "3/125", "1/250", "3/250", "3/500"], 4, `<code>0.756−0.750=0.006=6/1000=3/500</code>.`),
+      Q(620, `Which is equivalent to 114/2000?`, ["5/10+7/10", "5/10+7/100", "5/100+7/100", "5/100+7/1000", "5/1000+7/1000"], 3, `<code>114/2000=57/1000=0.057</code>. Also <code>5/100+7/1000=0.05+0.007=0.057</code>.`),
+      Q(621, `Eight consecutive odd integers have 9 as their seventh term. What is their sum?`, ["22", "32", "36", "40", "44"], 1, `The first term is <code>9−6×2=−3</code>. The sequence is −3,−1,1,3,5,7,9,11; its sum is 32.`),
+      Q(622, `Which fraction equals 5/6?`, ["20/30", "15/24", "25/30", "40/54", "2/7"], 2, `<code>25/30</code> reduces by 5 to <code>5/6</code>.`),
+      Q(623, `If (−3,C) lies on <code>y=3x²−2x+3</code>, find C.`, ["12", "15", "24", "30", "36"], 4, `Substitute x=−3: <code>C=3(9)−2(−3)+3=27+6+3=36</code>.`),
+      Q(624, `In <code>X=1/(2r)³</code>, r is halved. By what factor is X multiplied?`, ["1", "8", "64", "1/8", "1/16"], 1, `Halving r halves the denominator, and cubing makes the denominator 1/8 as large. Thus X becomes 8 times as large.`),
+      Q(625, `If <code>d=(a+b)/(1+ab/c²)</code>, a=c/2 and b=3c/4, find d in terms of c.`, ["5c/2", "5/(2c)", "10c/11", "10/(11c)", "10c/3"], 2, `The numerator is <code>5c/4</code> and the denominator is <code>1+3/8=11/8</code>. Therefore <code>d=(5c/4)(8/11)=10c/11</code>.`),
+      Q(626, `A rigid ladder reaches 4 m up a wall and its foot is 3 m from the wall. If the top slips down 1 m, how far does the bottom slip along the ground?`, ["1 m", "2 m", "4√3−3 m", "4 m", "5 m"], 0, `The ladder is 5 m long. After the top is at 3 m, the foot is <code>√(5²−3²)=4</code> m from the wall. It moves from 3 m to 4 m: 1 m.`),
+      Q(627, `If <code>3x+5x=−8</code>, then x+1 equals:`, ["−2", "−1", "0", "1", "2"], 2, `<code>8x=−8</code>, so x=−1 and x+1=0.`),
+      Q(628, `Which value is NOT equal to <code>34×(58+9)</code>?`, ["34×67", "34×58+34×9", "(9+58)×34", "58×(34+9)", "1,972+306"], 3, `The first, second, third and fifth expressions equal 34×67=2278. But <code>58×43=2494</code>, so D is not equal.`),
+      Q(629, `Calculate <code>(√7−2)(√7+2)</code>.`, ["√7−4", "2√7", "3", "5", "45"], 2, `Apply difference of squares: <code>(√7)²−2²=7−4=3</code>.`),
+      Q(630, `June has 30 days with overall mean X. The first 13 days averaged X−10. What was the average for the remaining 17 days?`, ["X+10", "(17X+10)/17", "(17X+130)/2", "(17X+130)/17", "(130X+17)/X"], 3, `Total temperature is 30X. The first 13 days total <code>13(X−10)=13X−130</code>, leaving <code>17X+130</code>. Divide by 17.`)
+    ];
+
+    let current = 0;
+    const answers = Array(questions.length).fill(null);
+    const $ = id => document.getElementById(id);
+    const letters = ["A", "B", "C", "D", "E", "F"];
+
+    function renderNavigator() {
+      $("jumpGrid").innerHTML = questions.map((q, i) =>
+        `<button class="jump ${i === current ? "current" : ""} ${answers[i] !== null ? "done" : ""}" data-index="${i}" type="button" title="Question ${q.number}">${q.number}</button>`
+      ).join("");
+      document.querySelectorAll(".jump").forEach(btn => btn.addEventListener("click", () => {
+        current = Number(btn.dataset.index);
+        render();
+      }));
+    }
+
+    function render() {
+      const q = questions[current];
+      const chosen = answers[current];
+      $("questionNumber").textContent = `Question ${q.number}`;
+      $("progressLabel").textContent = `Question ${current + 1} of ${questions.length}`;
+      const answered = answers.filter(a => a !== null).length;
+      $("answeredLabel").textContent = `${answered} answered`;
+      $("progressBar").style.width = `${((current + 1) / questions.length) * 100}%`;
+      $("score").textContent = `${answers.reduce((n, a, i) => n + (a === questions[i].answer ? 1 : 0), 0)} / ${answered}`;
+      $("stem").innerHTML = q.stem;
+      $("choices").innerHTML = q.options.map((option, i) => {
+        const state = chosen === null ? "" : (i === q.answer ? "correct" : (i === chosen ? "incorrect" : ""));
+        return `<button class="choice ${chosen === i ? "selected" : ""} ${state}" data-choice="${i}" type="button">
+          <span class="letter">${letters[i]}</span><span class="choice-text">${option}</span>
+        </button>`;
+      }).join("");
+      document.querySelectorAll(".choice").forEach(btn => btn.addEventListener("click", () => {
+        answers[current] = Number(btn.dataset.choice);
+        render();
+      }));
+      const feedback = $("feedback");
+      feedback.className = "feedback";
+      if (chosen !== null) {
+        feedback.textContent = chosen === q.answer ? "Correct — nice work." : `Not quite. The correct answer is ${letters[q.answer]}.`;
+        feedback.classList.add(chosen === q.answer ? "good" : "bad");
+      } else {
+        feedback.textContent = "";
+      }
+      $("explanation").classList.add("hidden");
+      $("explanation").innerHTML = `<strong>Solution:</strong> ${q.explanation}`;
+      $("solutionBtn").textContent = "Show solution";
+      $("prevBtn").disabled = current === 0;
+      $("nextBtn").textContent = current === questions.length - 1 ? "Finish" : "Next →";
+      renderNavigator();
+    }
+
+    $("prevBtn").addEventListener("click", () => { if (current > 0) { current--; render(); } });
+    $("nextBtn").addEventListener("click", () => {
+      if (current < questions.length - 1) { current++; render(); }
+      else { window.scrollTo({ top: 0, behavior: "smooth" }); }
+    });
+    $("solutionBtn").addEventListener("click", () => {
+      const box = $("explanation");
+      const hidden = box.classList.toggle("hidden");
+      $("solutionBtn").textContent = hidden ? "Show solution" : "Hide solution";
+    });
+    $("toggleNavBtn").addEventListener("click", () => {
+      const navigator = document.querySelector(".navigator");
+      const collapsed = navigator.classList.toggle("collapsed");
+      $("toggleNavBtn").textContent = collapsed ? "Show" : "Hide";
+      $("toggleNavBtn").setAttribute("aria-expanded", String(!collapsed));
+    });
+    $("resetBtn").addEventListener("click", () => {
+      if (confirm("Reset all answers and start again?")) {
+        answers.fill(null);
+        current = 0;
+        render();
+      }
+    });
+    render();
+  </script>
+</body>
+</html>
